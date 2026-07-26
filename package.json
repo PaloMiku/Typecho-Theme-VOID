@@ -1,5 +1,8 @@
 {
   "scripts": {
+    "dev": "gulp dev && npx sass assets/VOID.scss assets/VOID.css --style=compressed",
+    "build": "gulp build",
+    "sass": "npx sass assets/VOID.scss assets/VOID.css --style=compressed",
     "lint": "eslint gulpfile.js assets/VOID.js assets/VOIDCacheRule.js assets/check_update.js assets/editor.js assets/header.js"
   },
   "devDependencies": {
