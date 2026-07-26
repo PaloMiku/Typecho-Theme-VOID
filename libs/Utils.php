@@ -139,16 +139,8 @@ class Utils
     public static function addButton()
     {
         echo '<script src="';
-        self::indexTheme('/assets/libs/owo/owo_01.js');
-        echo '"></script>';
-
-        echo '<script src="';
         self::indexTheme('/assets/editor.js');
         echo '"></script>';
-
-        echo '<link rel="stylesheet" href="';
-        self::indexTheme('/assets/libs/owo/owo.min.css');
-        echo '" />';
 
         echo '<link rel="stylesheet" href="';
         self::indexTheme('/assets/editor-admin.css');

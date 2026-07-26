@@ -93,7 +93,7 @@ gulp.task('md5', function () {
 
 // 无需处理的文件
 gulp.task('move', function () {
-    gulp.src(['./assets/libs/owo/**/*', './assets/libs/mathjax/**/*'], { base: './assets/libs/', encoding: false })
+    gulp.src(['./assets/libs/mathjax/**/*'], { base: './assets/libs/', encoding: false })
         .pipe(gulp.dest('./build/assets/libs/'));
     gulp.src([
         './assets/sw-toolbox.js',

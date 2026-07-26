@@ -33,17 +33,6 @@ function insertAtCursor(myField, myValue) {
 function initEditorToolbar() {
     if ($('#wmd-button-row').length > 0) {
         $('#wmd-button-row').append('<li class="wmd-spacer wmd-spacer1"></li><li class="wmd-button" id="wmd-photoset-button" style="" title="插入图集">图集</li>');
-        $('#wmd-button-row').append('<li class="wmd-spacer wmd-spacer1"></li><li class="wmd-button" id="wmd-owo-button" style="" title="插入表情"><span style="width:unset" class="OwO"></span></li>');
-        new OwO({
-            logo: 'OωO',
-            container: document.getElementsByClassName('OwO')[0],
-            target: document.getElementById('text'),
-            api: '/usr/themes/VOID/assets/libs/owo/OwO_01.json',
-            preferredPosition: 'down',
-            position: 'down',
-            width: '400px',
-            maxHeight: '250px'
-        });
     }
 
     $(document).on('click', '#wmd-photoset-button', function () {
@@ -824,7 +813,6 @@ var VOID_Editor_Admin = (function ($) {
                 .replace(/<[^>]+>/g, ' ')
                 .replace(/#vwid=\d{1,5}&vhei=\d{1,5}/gi, ' ')
                 .replace(/\{\{(.+?):(.+?)\}\}/g, '$1')
-                .replace(/::\((.*?)\)|:@\((.*?)\)|:&\((.*?)\)|:\$\((.*?)\)|:!\((.*?)\)/g, ' ')
                 .replace(/\u00a0/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();

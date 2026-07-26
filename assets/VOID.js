@@ -525,7 +525,6 @@ var VOID = {
         VOID_Content.hyphenate();
 
         VOID_Vote.reload();
-        VOID.initOwO();
         AjaxComment.init();
 
         $('body').on('click', function (e) {
@@ -547,25 +546,6 @@ var VOID = {
         });
     },
 
-    initOwO: function () {
-        var container = document.getElementsByClassName('OwO')[0];
-        var target = document.getElementsByClassName('input-area')[0];
-
-        if (!container || !target || container.querySelector('.OwO-logo')) {
-            return;
-        }
-
-        new OwO({
-            logo: 'OωO',
-            container: container,
-            target: target,
-            api: '/usr/themes/VOID/assets/libs/owo/OwO_01.json',
-            preferredPosition: 'up',
-            position: 'up',
-            width: '400px',
-            maxHeight: '250px'
-        });
-    },
 
     isMainPjaxRequest: function (options) {
         return !options || options.container === '#pjax-container';
@@ -605,7 +585,6 @@ var VOID = {
         loadClipboard();
 
         VOID_Vote.reload();
-        VOID.initOwO();
         AjaxComment.init();
     },
 
@@ -861,7 +840,6 @@ var AjaxComment = {
         VOID_Content.parseUrl();
         VOID_Content.highlight();
         VOID_Vote.reload();
-        VOID.initOwO();
         AjaxComment.init();
     },
 
