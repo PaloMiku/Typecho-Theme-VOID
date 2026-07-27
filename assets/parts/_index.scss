@@ -54,6 +54,12 @@ main{
             @media screen and (max-width: 767px) {
                 padding: 50px 1rem;
             }
+            @media screen and (min-width: 1200px) {
+                padding: 100px 45px;
+            }
+            @media screen and (min-width: 1600px) {
+                padding: 130px 45px;
+            }
             /* animation */
             animation: float-down $animationTime-very-slow $animationTimingFunc both;
             .post-title{

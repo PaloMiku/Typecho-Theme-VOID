@@ -8,4 +8,5 @@ assets/VOID*.css
 assets/VOID*.css.map
 .DS_Store
 .playwright-cli/
+.zcode/*
 Plugins

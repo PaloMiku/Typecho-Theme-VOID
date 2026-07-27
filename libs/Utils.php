@@ -32,14 +32,25 @@ class Utils
 
     /**
      * 输出相对主题目录路径，用于静态文件
-     * 
+     *
+     * 自动附加文件内容哈希作为缓存版本号 (v=HASH)。
+     * 文件不变则哈希不变，浏览器复用缓存；文件变化自动换哈希，保证即时生效。
+     *
+     * @param string $path 相对主题目录的路径，如 "/assets/header.js"
      * @return void
      */
     public static function indexTheme($path)
     {
         $url = Helper::options()->themeUrl($path);
-        $glue = strpos($url, '?') === false ? '?' : '&';
-        echo $url . $glue . 'v=' . $GLOBALS['VOIDVersion'];
+
+        // 计算文件内容哈希作为缓存版本号
+        $filePath = dirname(__DIR__) . $path;
+        if (file_exists($filePath)) {
+            $hash = md5_file($filePath);
+            $url .= '?v=' . substr($hash, 0, 12);
+        }
+
+        echo $url;
     }
 
     /**

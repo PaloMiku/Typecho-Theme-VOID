@@ -108,7 +108,7 @@ Class Contents
     static private function sanitizeFeedHtml($content)
     {
         $content = preg_replace_callback(
-            '/<a\b([^>]*)>\s*<div\b[^>]*class="board-thumb"[^>]*><\/div>\s*<div\b[^>]*class="board-title"[^>]*>(.*?)<\/div>\s*<\/a>/is',
+            '/<a\b([^>]*)>\s*<div\b[^>]*class="board-thumb"[^>]*>.*?<\/div>\s*<div\b[^>]*class="board-info"[^>]*>.*?<div\b[^>]*class="board-title"[^>]*>(.*?)<\/div>.*?<\/div>\s*<\/a>/is',
             function ($matches) {
                 $href = '';
                 if (preg_match('/\bhref="([^"]+)"/i', $matches[1], $hrefMatches)) {
@@ -139,6 +139,7 @@ Class Contents
         }
 
         $isFeedContext = self::isFeedContext($widget);
+        $text = self::parseLinks($text);
         $text = self::parseRuby($text);
         $text = self::parseFancyBox($text, $isFeedContext);
         $text = self::parsePhotoSet($text);
@@ -348,13 +349,17 @@ Class Contents
     }
 
     /**
-     * 解析友情链接
+     * 解析友情链接短语法
      * 
      * @return string
      */
-    static public function markdown($text)
+    static public function parseLinks($text)
     {
         if (!is_string($text) || $text === '') {
+            return $text;
+        }
+
+        if (strpos($text, '[links]') === false && strpos($text, '<div class="board-list link-list">') === false) {
             return $text;
         }
 
@@ -368,6 +373,22 @@ Class Contents
 
         $reg = '/\[links.*?\](.*?)\[\/links\]/s';
         $text = preg_replace_callback($reg, array('Contents', 'parseBoardCallback2'), $text);
+
+        return $text;
+    }
+
+    /**
+     * 解析友情链接
+     * 
+     * @return string
+     */
+    static public function markdown($text)
+    {
+        if (!is_string($text) || $text === '') {
+            return $text;
+        }
+
+        $text = self::parseLinks($text);
 
         if (0 == strpos($text, '<!--markdown-->')) {
             $text = str_replace("```objective-c", "```objectivec", $text);
@@ -758,9 +779,15 @@ Class Contents
     {
         $text = "\n\n<div class=\"board-list link-list\">%boards%</div>\n\n";
 
-        $reg='/\[(.*?)\]\((.*?)\)\+\((.*?)\)/s';
-        $rp = '<a target="_blank" href="$2" class="board-item link-item"><div class="board-thumb" data-thumb="$3"></div><div class="board-title">$1</div></a>';
-        $boards = trim(preg_replace($reg, $rp, $matchs[1]));
+        // 支持4段式语法: [Name](URL)+(Avatar)+(Description)
+        $reg4='/\[(.*?)\]\((.*?)\)\+\((.*?)\)\+\((.*?)\)/s';
+        $rp4 = '<a target="_blank" href="$2" class="board-item link-item"><div class="board-thumb" data-thumb="$3"></div><div class="board-info"><div class="board-title">$1</div><div class="board-url">$2</div><div class="board-desc">$4</div></div></a>';
+        $boards = trim(preg_replace($reg4, $rp4, $matchs[1]));
+
+        // 兼容旧语法: [Name](URL)+(Avatar)
+        $reg3='/\[(.*?)\]\((.*?)\)\+\((.*?)\)/s';
+        $rp3 = '<a target="_blank" href="$2" class="board-item link-item"><div class="board-thumb" data-thumb="$3"></div><div class="board-info"><div class="board-title">$1</div><div class="board-url">$2</div></div></a>';
+        $boards = trim(preg_replace($reg3, $rp3, $boards));
 
         return  str_replace('%boards%', $boards, $text);
     }
