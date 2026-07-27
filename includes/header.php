@@ -86,7 +86,7 @@ if($this->is('post') || $this->is('page')) {
                     onclick="<?php if(!Utils::isPluginAvailable('ExSearch')) echo 'VOID_Ui.toggleSearch(this);'; ?>">
                     <i class="voidicon-search"></i>
                 </a>
-                <a target="_self" href="javascript:void(0);" id="toggle-setting" onclick="VOID_Ui.toggleSettingPanel();"><i class="voidicon-cog"></i></a>
+                <a target="_self" href="javascript:void(0);" id="toggle-setting" data-action="toggle-setting-panel"><i class="voidicon-cog"></i></a>
             </nav>
         </div>
         <div class="mobile-search-form">

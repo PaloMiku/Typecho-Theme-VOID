@@ -74,21 +74,26 @@ VOID_Util = {
     },
 
     setCookie: function (name, value, time) {
-        if (time > 0) {
-            document.cookie = name + '=' + escape(value) + ';max-age=' + String(time) + ';path=/';
-        } else {
-            // session
-            document.cookie = name + '=' + escape(value) + ';path=/';
-        }
+        try {
+            var data = { value: value };
+            if (time > 0) {
+                data.expiry = Date.now() + time * 1000;
+            }
+            localStorage.setItem('void_' + name, JSON.stringify(data));
+        } catch(e) {}
     },
 
     getCookie: function (name) {
-        var reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)');
-        var arr = document.cookie.match(reg);
-        if (arr)
-            return unescape(arr[2]);
-        else
-            return null;
+        try {
+            var raw = localStorage.getItem('void_' + name);
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            if (data.expiry && Date.now() > data.expiry) {
+                localStorage.removeItem('void_' + name);
+                return null;
+            }
+            return data.value;
+        } catch(e) { return null; }
     },
 
     /**
@@ -660,6 +665,43 @@ VOID_Ui = {
             setTimeout(function () {
                 $('#setting-panel').hide();
             }, 300);
+        }
+    });
+
+    // 面板事件委托：替代内联 onclick
+    $(document).on('click', '#ctrler-panel [data-action], #setting-panel [data-action], [data-action="toggle-setting-panel"]', function (e) {
+        var $el = $(this);
+        var action = $el.data('action');
+
+        switch (action) {
+            case 'scroll-top':
+                VOID_SmoothScroller.scrollTo(0);
+                break;
+            case 'toggle-setting-panel':
+                VOID_Ui.toggleSettingPanel();
+                break;
+            case 'toggle-toc':
+                TOC.toggle();
+                break;
+            case 'toggle-night':
+                VOID_Ui.DarkModeSwitcher.toggleByHand();
+                break;
+            case 'adjust-text':
+                VOID_Ui.adjustTextsize($el.data('direction') === 'up');
+                break;
+            case 'toggle-serif':
+                VOID_Ui.toggleSerif(this, $el.data('serif'));
+                break;
+            case 'toggle-login-form':
+                VOID_Ui.toggleLoginForm();
+                break;
+            case 'close-login-panel':
+                $('#login-panel').removeClass('show');
+                $('#setting-panel').removeClass('show');
+                break;
+            case 'remember-pos':
+                VOID_Ui.rememberPos();
+                break;
         }
     });
 })();

@@ -37,7 +37,9 @@ class Utils
      */
     public static function indexTheme($path)
     {
-        Helper::options()->themeUrl($path);
+        $url = Helper::options()->themeUrl($path);
+        $glue = strpos($url, '?') === false ? '?' : '&';
+        echo $url . $glue . 'v=' . $GLOBALS['VOIDVersion'];
     }
 
     /**

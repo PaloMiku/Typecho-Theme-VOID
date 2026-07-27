@@ -26,7 +26,7 @@ $setting = $GLOBALS['VOIDSetting'];
         <!--侧边控制按钮-->
         <aside id="ctrler-panel">
             <div class="ctrler-item" id="go-top">
-                <a target="_self" aria-label="返回顶部" href="javascript:void(0);" style="transform: translateX(-2px);" onclick="VOID_SmoothScroller.scrollTo(0);"><i class="voidicon-up"></i></a>
+                <a target="_self" aria-label="返回顶部" href="javascript:void(0);" style="transform: translateX(-2px);" data-action="scroll-top"><i class="voidicon-up"></i></a>
             </div>
 
             <?php if($this->user->hasLogin()): ?>
@@ -39,10 +39,10 @@ $setting = $GLOBALS['VOIDSetting'];
             <?php endif; ?>
 
             <div aria-label="展开或关闭设置面板" id="toggle-setting-pc" class="ctrler-item hidden-xs">
-                <a target="_self" href="javascript:void(0);" style="transform: translateX(-2px);" onclick="VOID_Ui.toggleSettingPanel();"><i class="voidicon-cog"></i></a>
+                <a target="_self" href="javascript:void(0);" style="transform: translateX(-2px);" data-action="toggle-setting-panel"><i class="voidicon-cog"></i></a>
             </div>
             <div aria-label="展开或关闭文章目录" class="ctrler-item" id="toggle-toc">
-                <a target="_self" href="javascript:void(0);" style="margin-left: -2px" onclick="TOC.toggle()"><i class="voidicon-left"></i></a>
+                <a target="_self" href="javascript:void(0);" style="margin-left: -2px" data-action="toggle-toc"><i class="voidicon-left"></i></a>
             </div>
         </aside>
 
@@ -50,23 +50,23 @@ $setting = $GLOBALS['VOIDSetting'];
         <aside hidden id="setting-panel">
             <section>
                 <div id="toggle-night">
-                    <a target="_self" href="javascript:void(0)" onclick="VOID_Ui.DarkModeSwitcher.toggleByHand();"><i></i></a>
+                    <a target="_self" href="javascript:void(0)" data-action="toggle-night"><i></i></a>
                 </div>
                 <div id="adjust-text-container">
                     <div class="adjust-text-item">
-                        <a target="_self" href="javascript:void(0)" onclick="VOID_Ui.adjustTextsize(false);"><i class="voidicon-font"></i>-</a>
+                        <a target="_self" href="javascript:void(0)" data-action="adjust-text" data-direction="down"><i class="voidicon-font"></i>-</a>
                         <span id="current_textsize"></span>
-                        <a target="_self" href="javascript:void(0)" onclick="VOID_Ui.adjustTextsize(true);"><i class="voidicon-font"></i>+</a>
+                        <a target="_self" href="javascript:void(0)" data-action="adjust-text" data-direction="up"><i class="voidicon-font"></i>+</a>
                     </div>
                     <div class="adjust-text-item">
-                        <a target="_self" class="font-indicator <?php if(!Utils::isSerif($setting)) echo ' checked'; ?>" href="javascript:void(0)" onclick="VOID_Ui.toggleSerif(this, false);">Sans</a>
-                        <a target="_self" class="font-indicator <?php if(Utils::isSerif($setting)) echo ' checked'; ?>" href="javascript:void(0)" onclick="VOID_Ui.toggleSerif(this, true);">Serif</a>
+                        <a target="_self" class="font-indicator <?php if(!Utils::isSerif($setting)) echo ' checked'; ?>" href="javascript:void(0)" data-action="toggle-serif" data-serif="false">Sans</a>
+                        <a target="_self" class="font-indicator <?php if(Utils::isSerif($setting)) echo ' checked'; ?>" href="javascript:void(0)" data-action="toggle-serif" data-serif="true">Serif</a>
                     </div>
                 </div>
             </section>
             <section id="links">
                 <?php if(!$this->user->hasLogin()): ?>
-                    <a target="_self" class="link" href="javascript:void(0)" onclick="VOID_Ui.toggleLoginForm()"><i class="voidicon-user"></i></a>       
+                    <a target="_self" class="link" href="javascript:void(0)" data-action="toggle-login-form"><i class="voidicon-user"></i></a>       
                 <?php endif; ?>
                 <a class="link" title="RSS" target="_blank" href="<?php $this->options->feedUrl(); ?>"><i class="voidicon-rss"></i></a>
                 <?php
@@ -87,15 +87,15 @@ $setting = $GLOBALS['VOIDSetting'];
                             ?>">
                         </div>
                         <div class="buttons" id="loggin-buttons">
-                            <button class="btn btn-normal" type="button" onclick="$('#login-panel').removeClass('show');$('#setting-panel').removeClass('show')">关闭</button>
-                            <button class="btn btn-normal" type="submit" onclick="VOID_Ui.rememberPos()">登录</button>
+                            <button class="btn btn-normal" type="button" data-action="close-login-panel">关闭</button>
+                            <button class="btn btn-normal" type="submit" data-action="remember-pos">登录</button>
                             <span hidden id="wait" class="btn btn-normal">请稍等……</span>
                         </div>
                     </form>
                 <?php else: ?>
                     <div class="buttons" id="manage-buttons">
                         <a class="btn btn-normal" no-pjax target="_blank" href="<?php $this->options->adminUrl(); ?>">后台</a>
-                        <a class="btn btn-normal" no-pjax title="登出" onclick="VOID_Ui.rememberPos()" href="<?php $this->options->logoutUrl(); ?>">登出</a>
+                        <a class="btn btn-normal" no-pjax title="登出" data-action="remember-pos" href="<?php $this->options->logoutUrl(); ?>">登出</a>
                     </div>
                 <?php endif; ?> 
             </section> 
