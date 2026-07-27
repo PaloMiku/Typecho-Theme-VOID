@@ -190,21 +190,71 @@
                     .avatar{
                         width: 46px;
                         height: 46px;
+                        border-radius: 50%;
                     }
                 }
                 .comment-author{
+                    display: flex;
                     margin-bottom: 0;
+                }
+                .comment-info{
+                    flex: 1;
+                }
+                .comment-author-line{
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+                    cite{
+                        font-style: normal;
+                        font-size: 0.9rem;
+                    }
                     .comment-parent-label,
                     .comment-parent-author{
-                        font-size: 0.9rem;
+                        font-size: 0.85rem;
                     }
                     .comment-parent-author{
                         margin-right: 0.3em;
                     }
+                    .manage-comments{
+                        font-style: normal;
+                        font-size: 0.9rem;
+                    }
                 }
-                cite, .manage-comments{
-                    font-style: normal;
-                    font-size: 0.9rem;
+                .comment-meta-line{
+                    display: flex;
+                    align-items: center;
+                    gap: 0.35rem;
+                    flex-wrap: wrap;
+                    margin-top: 0.15rem;
+                    font-size: 0.8rem;
+                    color: rgba(0,0,0,.35);
+                    .theme-dark &{
+                        color: $td-textColor-dark;
+                    }
+                    a {
+                        color: inherit;
+                        &:hover{
+                            color: $highlightColor;
+                        }
+                    }
+                }
+                // 客户端小图标（OS/浏览器/归属地）
+                .comment-icons{
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.2rem;
+                }
+                .comment-icon{
+                    display: inline-flex;
+                    align-items: center;
+                    opacity: 0.65;
+                    transition: opacity 0.15s;
+                    &:hover{
+                        opacity: 1;
+                    }
+                    svg{
+                        display: block;
+                    }
                 }
             }
             .comment-content{
@@ -332,6 +382,7 @@
                     .avatar{
                         width: 38px;
                         height: 38px;
+                        border-radius: 50%;
                     }
                     &.star::after{
                         top: 22px;
@@ -341,16 +392,51 @@
                 }
                 .comment-author{
                     display: flex;
+                }
+                .comment-author-line{
+                    display: flex;
                     align-items: center;
-                    flex-wrap: wrap;
-                    gap: 0.35rem;
-                    margin-bottom: 0;
+                    gap: 0.3rem;
+                    cite{
+                        font-style: normal;
+                        font-size: 0.9rem;
+                    }
                     .comment-parent-label,
                     .comment-parent-author{
-                        font-size: 0.9rem;
+                        font-size: 0.85rem;
                     }
                     .comment-parent-author{
                         margin-right: 0.3em;
+                    }
+                }
+                .comment-meta-line{
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+                    flex-wrap: wrap;
+                    margin-top: 0.1rem;
+                    font-size: 0.75rem;
+                    color: rgba(0,0,0,.35);
+                    .theme-dark &{
+                        color: $td-textColor-dark;
+                    }
+                    a{
+                        color: inherit;
+                    }
+                }
+                .comment-icons{
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.15rem;
+                }
+                .comment-icon{
+                    display: inline-flex;
+                    align-items: center;
+                    opacity: 0.6;
+                    svg{
+                        width: 13px;
+                        height: 13px;
+                        display: block;
                     }
                 }
             }
