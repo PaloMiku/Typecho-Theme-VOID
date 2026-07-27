@@ -452,6 +452,26 @@ VOID_Ui = {
         }
 
         VOID_Util.setCookie('textsize', $('body').attr('fontsize'), 2592000);
+        VOID_Ui.updateSliderFromFontsize();
+    },
+
+    /* 字号滑块：根据 body fontsize 同步滑块位置和进度条 */
+    updateSliderFromFontsize: function () {
+        var current = parseInt($('body').attr('fontsize')) || 3;
+        var $slider = $('#font-size-slider');
+        if ($slider.length) {
+            $slider.val(current);
+            VOID_Ui.updateSliderTrack($slider[0]);
+        }
+    },
+
+    /* 更新滑块轨道填充进度 */
+    updateSliderTrack: function (slider) {
+        var min = parseFloat(slider.min) || 1;
+        var max = parseFloat(slider.max) || 5;
+        var val = parseFloat(slider.value) || 3;
+        var percent = ((val - min) / (max - min)) * 100;
+        slider.style.setProperty('--slider-progress', percent + '%');
     },
 
     toggleLoginForm: function () {
@@ -719,9 +739,6 @@ VOID_Ui = {
             case 'toggle-night':
                 VOID_Ui.DarkModeSwitcher.toggleByHand();
                 break;
-            case 'adjust-text':
-                VOID_Ui.adjustTextsize($el.data('direction') === 'up');
-                break;
             case 'toggle-serif':
                 VOID_Ui.toggleSerif(this, $el.data('serif'));
                 break;
@@ -792,6 +809,21 @@ VOID_Ui = {
     $(document).on('keydown', '[data-action="enter-search"]', function (e) {
         if (e.keyCode === 13) {
             VOID.startSearch(this);
+        }
+    });
+
+    // 初始化：字号滑块位置与轨道
+    VOID_Ui.updateSliderFromFontsize();
+
+    /* 字号滑块 input 事件：拖动时实时调整字号，不关闭面板 */
+    $(document).on('input', '#font-size-slider', function () {
+        var size = parseInt(this.value);
+        var current = parseInt($('body').attr('fontsize')) || 3;
+
+        if (size !== current) {
+            $('body').attr('fontsize', String(size));
+            VOID_Util.setCookie('textsize', String(size), 2592000);
+            VOID_Ui.updateSliderTrack(this);
         }
     });
 })();

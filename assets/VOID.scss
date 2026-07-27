@@ -288,308 +288,485 @@ p.notice {
     }
 }
 
+/* ============================================
+   右下角工具箱 — 现代化浮动按钮组
+   ============================================ */
+
 #ctrler-panel {
     position: fixed;
     right: 1.5rem;
     bottom: 1.5rem;
-    width: 40px;
     z-index: 3;
-    transition: $animationTime $animationTimingFunc transform;
     display: flex;
     flex-direction: column;
-    .sidebar-show & {
-        transform: translateX(calc(-240px - 1rem));
-    }
+    gap: 8px;
+    transition: $animationTime $animationTimingFunc transform;
+
     .ctrler-item {
-        height: 40px;
-        width: 40px;
-        @include sidebar;
-        a{
-            display: block;
-            padding: 0.65rem;
-            color: $td-textColor-light;
-            text-align: center;
+        width: 42px;
+        height: 42px;
+
+        a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: $bgColor;
+            border: 1px solid $borderColor;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            color: $fadeColor;
+            font-size: 1.1rem;
+            transition: all $animationTime $animationTimingFunc;
+
+            .theme-dark & {
+                background: $td-bgColor-light;
+                border-color: rgba(255, 255, 255, 0.08);
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+                color: $td-textColor;
+            }
+
+            &:hover {
+                color: $textColor;
+                transform: scale(1.08);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+                .theme-dark & {
+                    color: #fff;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+                }
+            }
+
+            &:active {
+                transform: scale(0.96);
+            }
         }
-        &#go-top{
+
+        &#go-top {
             display: none;
-            @media screen and (min-width: 1199.5px){
+            @media screen and (min-width: 1199.5px) {
                 &.show {
                     display: block;
-                }   
+                }
             }
         }
     }
 }
 
+/* ============================================
+   设置面板 — 现代化卡片式设计
+   ============================================ */
+
 #setting-panel {
     position: fixed;
-    transition: $animationTime $animationTimingFunc transform, 
-                $animationTime $animationTimingFunc opacity;
-    box-shadow: initial;
+    z-index: 4;
+    width: 280px;
     opacity: 0;
+    transition: opacity $animationTime $animationTimingFunc,
+                transform $animationTime $animationTimingFunc;
 
-    /* large screen */
+    /* 桌面端：右下角弹出 */
     right: 80px;
-    .sidebar-show & {
-        right: 330px;
-    }
     bottom: 1.5rem;
-    transform: translate(0, 1.5rem);
+    transform: translate(0, 12px) scale(0.98);
+
     .setting-panel-show & {
         opacity: 1;
-        transform: translate(0, 0);
+        transform: translate(0, 0) scale(1);
     }
 
-    /* small screen */
-    @media screen and (max-width: 767.5px){
-        right: unset;
-        bottom: unset;
-        top: 70px;
-        left: 50%;
-        transform: translate(-50%, -20px)!important;
+    /* 移动端：底部抽屉 */
+    @media screen and (max-width: 767.5px) {
+        right: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+        width: auto;
+        top: auto;
+        transform: translateY(100%);
+
         .setting-panel-show & {
-            top: 70px;
-            transform: translate(-50%, 0)!important;
+            transform: translateY(0);
         }
     }
 
-    z-index: 2;
-    border: solid 8px rgba(#eee, 0.8);
-    border-radius: 0;
-    background: #fafafa;
+    /* 卡片外观 */
+    border-radius: 14px;
+    background: $bgColor;
+    border: 1px solid $borderColor;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+
     .theme-dark & {
-        border-color: $headerBgColor;
-        background: $td-bgColor;
-        color: $td-textColor-light;
+        background: $td-bgColor-light;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4),
+                    0 0 0 1px rgba(255, 255, 255, 0.04);
     }
-    width: 250px;
+
+    /* 面板内容 */
     section {
-        padding: 12px 5px;
+        padding: 14px 16px;
         display: flex;
-        > * {
+        align-items: center;
+        gap: 12px;
+
+        &:not(:first-child) {
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+            .theme-dark & {
+                border-color: rgba(255, 255, 255, 0.06);
+            }
+        }
+    }
+
+    /* 夜间模式开关 */
+    #toggle-night {
+        flex-shrink: 0;
+
+        &.switching a {
+            animation: switch 1.2s $animationTimingFunc;
+        }
+
+        a {
             display: flex;
             justify-content: center;
             align-items: center;
-            &:last-of-type {
-                margin-right: 0;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
+            transition: all $animationTime $animationTimingFunc;
+
+            &:hover {
+                background: rgba(245, 158, 11, 0.14);
+                transform: scale(1.05);
+            }
+
+            .theme-dark & {
+                color: #fbbf24;
+                background: rgba(251, 191, 36, 0.12);
+
+                &:hover {
+                    background: rgba(251, 191, 36, 0.2);
+                }
+            }
+
+            i::before {
+                content: '\f185';
+                font-family: "void-icon";
+                font-style: normal;
+                font-size: 1.4rem;
+            }
+
+            .theme-dark & i:before {
+                content: '\f186';
             }
         }
+    }
 
-        #toggle-night {
-            font-size: 2.8rem;
-            padding-right: 5px;
-            border-right: 1px solid rgba(#000, 0.1);
-            .theme-dark & {
-                border-color: rgba(#fff, 0.1);
+    /* 字号调节区域 */
+    #adjust-text-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .adjust-text-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .adjust-label {
+                font-size: 0.75rem;
+                color: $fadeColor;
+                min-width: 28px;
+                flex-shrink: 0;
+
+                .theme-dark & {
+                    color: $td-textColor-dark;
+                }
             }
-            &.switching a {
-                animation: switch 1.2s $animationTimingFunc;
-            }
-            a {
-                display: block;
-                width: 62px;
-                height: 62px;
-                line-height: 62px;
-                color: #ffe150;
-                border-radius: 50%;
-                &:hover {
-                    background: #f5f5f5;
+
+            /* 字号滑块 */
+            #font-size-slider {
+                flex: 1;
+                -webkit-appearance: none;
+                appearance: none;
+                height: 4px;
+                border-radius: 2px;
+                background: rgba(0, 0, 0, 0.1);
+                outline: none;
+                cursor: pointer;
+
+                .theme-dark & {
+                    background: rgba(255, 255, 255, 0.12);
+                }
+
+                /* 滑块轨道（Webkit） */
+                &::-webkit-slider-runnable-track {
+                    height: 4px;
+                    border-radius: 2px;
+                    background: linear-gradient(to right, #54BC4B var(--slider-progress, 50%), rgba(0, 0, 0, 0.1) var(--slider-progress, 50%));
                     .theme-dark & {
-                        background: $headerBgColor;
+                        background: linear-gradient(to right, #54BC4B var(--slider-progress, 50%), rgba(255, 255, 255, 0.12) var(--slider-progress, 50%));
                     }
                 }
-                i {
-                    display: block;
+
+                /* 滑块轨道（Firefox） */
+                &::-moz-range-track {
+                    height: 4px;
+                    border-radius: 2px;
+                    background: rgba(0, 0, 0, 0.1);
+                    .theme-dark & {
+                        background: rgba(255, 255, 255, 0.12);
+                    }
                 }
-                i::before {
-                    content: '\f185';
-                    font-family: "void-icon";
-                    font-style: normal;
-                    font-weight: normal;
-                    text-decoration: none;
-                    display: flex;
-                    width: 100%;
-                    height: 100%;
-                    justify-content: center;
-                    align-items: center;
+                &::-moz-range-progress {
+                    height: 4px;
+                    border-radius: 2px;
+                    background: #54BC4B;
                 }
+
+                /* 滑块手柄（Webkit） */
+                &::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    background: #fff;
+                    border: 2px solid #54BC4B;
+                    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+                    margin-top: -6px;
+                    transition: transform $animationTime $animationTimingFunc;
+
+                    .theme-dark & {
+                        background: $td-bgColor-light;
+                        border-color: #6dde64;
+                        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+                    }
+
+                    &:hover {
+                        transform: scale(1.15);
+                    }
+
+                    &:active {
+                        transform: scale(1.05);
+                    }
+                }
+
+                /* 滑块手柄（Firefox） */
+                &::-moz-range-thumb {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    background: #fff;
+                    border: 2px solid #54BC4B;
+                    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+                    cursor: pointer;
+
+                    .theme-dark & {
+                        background: $td-bgColor-light;
+                        border-color: #6dde64;
+                    }
+                }
+            }
+
+            /* 当前字号指示 */
+            #current_textsize {
+                min-width: 24px;
+                text-align: right;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: $textColor;
+                flex-shrink: 0;
+
                 .theme-dark & {
                     color: $td-textColor-light;
-                    i:before {
-                        content: '\f186';
-                    }
                 }
-                
-            }
-        }
 
-        #adjust-text-container {
-            padding-left: 5px;
-            flex-direction: column;
-            flex: 1;
-            justify-content: space-around;
-            .adjust-text-item {
-                width: 100%;
-                display: flex;
-                flex-direction: row;
-                &:first-of-type {
-                    margin-bottom: 5px;
-                    a:first-of-type {
-                        font-size: 0.8rem
-                    }
-                    a:hover {
-                        background: #eee;
-                        .theme-dark & {
-                            background: $headerBgColor;
-                        }
-                    }
-                }
-                #current_textsize {
-                    &::before {
-                        content: '18';
-                    }
-                    [fontsize="1"] &::before {
-                        content: '14';
-                    }
-                    [fontsize="2"] &::before {
-                        content: '16';
-                    }
-                    [fontsize="4"] &::before {
-                        content: '20';
-                    }
-                    [fontsize="5"] &::before {
-                        content: '22';
-                    }
-                }
-                a, span {
-                    flex: 1;
-                    display: flex;
-                    justify-content: center;
-                    align-items: flex-end;
-                    padding: 5px;
-                    border-radius: 0;
-                    &.checked {
-                        background: #ffe150;
-                        .theme-dark & {
-                            background: $headerBgColor;
-                        }
-                    }
-                }
+                &::before { content: '18'; }
+                [fontsize="1"] &::before { content: '14'; }
+                [fontsize="2"] &::before { content: '16'; }
+                [fontsize="4"] &::before { content: '20'; }
+                [fontsize="5"] &::before { content: '22'; }
             }
-        }
 
-        &#links {
-            border-top: 1px solid rgba(#000, 0.1);
-            .theme-dark & {
-                border-color: rgba(#fff, 0.1)
-            }
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            font-size: 1.2rem;
-            max-width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            a {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 5px;
-                width: 37px;
-                height: 37px;
-                border-radius: 50%;
+            /* 字体切换 */
+            .font-indicator {
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                color: $fadeColor;
+                cursor: pointer;
+                transition: all $animationTime $animationTimingFunc;
+
+                .theme-dark & {
+                    color: $td-textColor;
+                }
+
                 &:hover {
-                    background: #f5f5f5;
+                    color: $textColor;
+                    background: rgba(0, 0, 0, 0.04);
+
                     .theme-dark & {
-                        background: $td-bgColor;
+                        color: #fff;
+                        background: rgba(255, 255, 255, 0.06);
+                    }
+                }
+
+                &.checked {
+                    color: $textColor;
+                    background: rgba(0, 0, 0, 0.06);
+                    font-weight: 500;
+
+                    .theme-dark & {
+                        color: #fff;
+                        background: rgba(255, 255, 255, 0.1);
                     }
                 }
             }
         }
+    }
 
-        &#login-panel {
-            display: none;
-            &.show, &.force-show {
-                display: flex;
-            }
-            flex-direction: column;
-            border-top: 1px solid rgba(#000, 0.1);
+    /* 链接区 */
+    &#links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 12px 16px;
+
+        a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            color: $fadeColor;
+            transition: all $animationTime $animationTimingFunc;
+
             .theme-dark & {
-                border-color: rgba(#fff, 0.1)
+                color: $td-textColor;
             }
 
-            div {
-                display: flex;
-                width: 100%;
-                &.buttons {
-                    flex-direction: row;
-                }
-                .btn {
-                    outline: none;
-                    flex: 1;
-                    max-width: unset;
-                    &:first-of-type {
-                        margin-right: 3px;
-                    }
-                    &:last-of-type {
-                        margin-left: 3px;
-                    }
+            &:hover {
+                color: $textColor;
+                background: rgba(0, 0, 0, 0.04);
+                transform: scale(1.1);
+
+                .theme-dark & {
+                    color: #fff;
+                    background: rgba(255, 255, 255, 0.08);
                 }
             }
+        }
+    }
 
-            .buttons {
-                display: flex;
-                width: 100%;
+    /* 登录面板 */
+    #login-panel {
+        display: none;
+        flex-direction: column;
 
+        &.show, &.force-show {
+            display: flex;
+        }
+
+        div {
+            display: flex;
+            width: 100%;
+
+            &.buttons {
+                flex-direction: row;
+                gap: 8px;
             }
 
-            form {
+            .btn {
+                outline: none;
+                flex: 1;
+                max-width: unset;
+                border-radius: 8px;
+            }
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+
+            &.show {
                 display: flex;
+            }
+
+            div#loggin-inputs {
                 flex-direction: column;
-                &.show {
-                    display: flex;
-                }
-                div#loggin-inputs {
-                    flex-direction: column;
-                    input {
-                        padding: 7.5px;
-                        outline: none;
-                        background: none;
-                        border: solid 2px rgba(#000, 0.1);
-                        margin-bottom: 6px;
-                        border-radius: 0;
-                        color: inherit;
-                        &::-webkit-input-placeholder{
-                            color: $fadeColor;
-                            font-size: 1rem;
-                        }
+
+                input {
+                    padding: 10px 12px;
+                    outline: none;
+                    background: rgba(0, 0, 0, 0.02);
+                    border: 1px solid rgba(0, 0, 0, 0.08);
+                    margin-bottom: 8px;
+                    border-radius: 8px;
+                    color: inherit;
+                    font-size: 0.9rem;
+                    transition: border-color $animationTime $animationTimingFunc;
+
+                    .theme-dark & {
+                        background: rgba(255, 255, 255, 0.04);
+                        border-color: rgba(255, 255, 255, 0.1);
+                    }
+
+                    &:focus {
+                        border-color: #54BC4B;
+                    }
+
+                    &::placeholder {
+                        color: $fadeColor;
                         .theme-dark & {
-                            border-color: rgba(#fff, 0.1);
-                            &::-webkit-input-placeholder{
-                                color: $td-textColor-dark;
-                            }
+                            color: $td-textColor-dark;
                         }
                     }
                 }
-                div#loggin-buttons {
-                    justify-content: flex-end;
-                    .btn#wait {
-                        display: none;
-                    }
+            }
+
+            div#loggin-buttons {
+                justify-content: flex-end;
+                gap: 8px;
+
+                .btn#wait {
+                    display: none;
                 }
-                &.need-refresh {
-                    div#loggin-inputs {
-                        display: none;
-                    }
-                    div#loggin-buttons .btn {
-                        display: none;
-                        &#wait {
-                            display: inline-block;
-                        }
+            }
+
+            &.need-refresh {
+                div#loggin-inputs {
+                    display: none;
+                }
+                div#loggin-buttons .btn {
+                    display: none;
+                    &#wait {
+                        display: inline-block;
                     }
                 }
             }
         }
+    }
+}
+
+/* 移动端：面板打开时的遮罩层 */
+@media screen and (max-width: 767.5px) {
+    body.setting-panel-show::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 3;
+        animation: fade-in $animationTime $animationTimingFunc forwards;
     }
 }
 

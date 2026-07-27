@@ -23,50 +23,56 @@ $setting = $GLOBALS['VOIDSetting'];
             </div>
         </footer>
 
-        <!--侧边控制按钮-->
+        <!--右下角控制按钮组-->
         <aside id="ctrler-panel">
             <div class="ctrler-item" id="go-top">
-                <a target="_self" aria-label="返回顶部" href="javascript:void(0);" style="transform: translateX(-2px);" data-action="scroll-top"><i class="voidicon-up"></i></a>
+                <a target="_self" aria-label="返回顶部" href="javascript:void(0);" data-action="scroll-top"><i class="voidicon-up"></i></a>
             </div>
 
             <?php if($this->user->hasLogin()): ?>
                 <div class="ctrler-item hidden-xs">
-                    <a target="_blank" aria-label="进入后台" href="<?php $this->options->adminUrl(); ?>" style="transform: translateX(-2px);"><i class="voidicon-login"></i></a>
+                    <a target="_blank" aria-label="进入后台" href="<?php $this->options->adminUrl(); ?>"><i class="voidicon-login"></i></a>
                 </div>
                 <div class="ctrler-item hidden-xs">
-                    <a target="_blank" aria-label="管理评论" href="<?php $this->options->adminUrl('manage-comments.php'); ?>" style="transform: translateX(-2px);"><i class="voidicon-comment"></i></a>
+                    <a target="_blank" aria-label="管理评论" href="<?php $this->options->adminUrl('manage-comments.php'); ?>"><i class="voidicon-comment"></i></a>
                 </div>
             <?php endif; ?>
 
             <div aria-label="展开或关闭设置面板" id="toggle-setting-pc" class="ctrler-item hidden-xs">
-                <a target="_self" href="javascript:void(0);" style="transform: translateX(-2px);" data-action="toggle-setting-panel"><i class="voidicon-cog"></i></a>
+                <a target="_self" href="javascript:void(0);" data-action="toggle-setting-panel"><i class="voidicon-cog"></i></a>
             </div>
             <div aria-label="展开或关闭文章目录" class="ctrler-item" id="toggle-toc">
-                <a target="_self" href="javascript:void(0);" style="margin-left: -2px" data-action="toggle-toc"><i class="voidicon-left"></i></a>
+                <a target="_self" href="javascript:void(0);" data-action="toggle-toc"><i class="voidicon-left"></i></a>
             </div>
         </aside>
 
-        <!--站点设置面板-->
+        <!--设置面板-->
         <aside hidden id="setting-panel">
-            <section>
+            <!-- 外观设置 -->
+            <section id="appearance-settings">
                 <div id="toggle-night">
                     <a target="_self" href="javascript:void(0)" data-action="toggle-night"><i></i></a>
                 </div>
                 <div id="adjust-text-container">
                     <div class="adjust-text-item">
-                        <a target="_self" href="javascript:void(0)" data-action="adjust-text" data-direction="down"><i class="voidicon-font"></i>-</a>
+                        <span class="adjust-label">字号</span>
+                        <input type="range" id="font-size-slider" min="1" max="5" step="1" value="3"
+                               data-action="adjust-text-slider"
+                               aria-label="字号调节滑块">
                         <span id="current_textsize"></span>
-                        <a target="_self" href="javascript:void(0)" data-action="adjust-text" data-direction="up"><i class="voidicon-font"></i>+</a>
                     </div>
                     <div class="adjust-text-item">
+                        <span class="adjust-label">字体</span>
                         <a target="_self" class="font-indicator <?php if(!Utils::isSerif($setting)) echo ' checked'; ?>" href="javascript:void(0)" data-action="toggle-serif" data-serif="false">Sans</a>
                         <a target="_self" class="font-indicator <?php if(Utils::isSerif($setting)) echo ' checked'; ?>" href="javascript:void(0)" data-action="toggle-serif" data-serif="true">Serif</a>
                     </div>
                 </div>
             </section>
+
+            <!-- 链接区 -->
             <section id="links">
                 <?php if(!$this->user->hasLogin()): ?>
-                    <a target="_self" class="link" href="javascript:void(0)" data-action="toggle-login-form"><i class="voidicon-user"></i></a>       
+                    <a target="_self" class="link" href="javascript:void(0)" data-action="toggle-login-form" title="登录"><i class="voidicon-user"></i></a>
                 <?php endif; ?>
                 <a class="link" title="RSS" target="_blank" href="<?php $this->options->feedUrl(); ?>"><i class="voidicon-rss"></i></a>
                 <?php
@@ -75,13 +81,15 @@ $setting = $GLOBALS['VOIDSetting'];
                     }
                 ?>
             </section>
+
+            <!-- 登录面板 -->
             <section id="login-panel" <?php if($this->user->hasLogin()) echo 'class="force-show"'; ?>>
                 <?php if(!$this->user->hasLogin()): ?>
                     <form action="<?php $this->options->loginAction()?>" id="loggin-form" method="post" name="login" role="form">
                         <div id="loggin-inputs">
                             <input type="text" name="name" autocomplete="username" placeholder="请输入用户名" required/>
                             <input type="password" name="password" autocomplete="current-password" placeholder="请输入密码" required/>
-                            <input type="hidden" name="referer" value="<?php 
+                            <input type="hidden" name="referer" value="<?php
                                 if($this->is('index')) $this->options->siteUrl();
                                 else $this->permalink();
                             ?>">
@@ -97,8 +105,8 @@ $setting = $GLOBALS['VOIDSetting'];
                         <a class="btn btn-normal" no-pjax target="_blank" href="<?php $this->options->adminUrl(); ?>">后台</a>
                         <a class="btn btn-normal" no-pjax title="登出" data-action="remember-pos" href="<?php $this->options->logoutUrl(); ?>">登出</a>
                     </div>
-                <?php endif; ?> 
-            </section> 
+                <?php endif; ?>
+            </section>
         </aside>
 
         <?php
