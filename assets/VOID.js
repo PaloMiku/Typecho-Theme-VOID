@@ -944,7 +944,7 @@ var VOID_Vote = {
 
 var Share = {
     parseItem: function (item) {
-        item = $(item).parent();
+        item = $(item).closest('.social-button');
         return {
             url: $(item).attr('data-url'),
             title: $(item).attr('data-title'),
@@ -957,17 +957,114 @@ var Share = {
 
     toWeibo: function (item) {
         var content = Share.parseItem(item);
-        var url = 'http://service.weibo.com/share/share.php?appkey=&title=分享《' + content.title + '》 @' + content.weibo + '%0a%0a' + content.excerpt
-            + '&url=' + content.url
-            + '&pic=' + content.img + '&searchPic=false&style=simple';
-        window.open(url);
+        var url = 'https://service.weibo.com/share/share.php?appkey=&title=' + encodeURIComponent('分享《' + content.title + '》 @' + content.weibo + '\n\n' + content.excerpt)
+            + '&url=' + encodeURIComponent(content.url)
+            + '&pic=' + encodeURIComponent(content.img) + '&searchPic=false&style=simple';
+        window.open(url, '_blank', 'width=600,height=400');
     },
 
-    toTwitter: function (item) {
+    toX: function (item) {
         var content = Share.parseItem(item);
-        var url = 'https://twitter.com/intent/tweet?text=分享《' + content.title + '》 @' + content.twitter + '%0a%0a' + content.excerpt
-            + '%20' + content.url;
-        window.open(url);
+        var text = encodeURIComponent('分享《' + content.title + '》');
+        var url = 'https://x.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(content.url);
+        if (content.twitter) {
+            url += '&via=' + encodeURIComponent(content.twitter);
+        }
+        window.open(url, '_blank', 'width=600,height=400');
+    },
+
+    toFacebook: function (item) {
+        var content = Share.parseItem(item);
+        var url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(content.url);
+        window.open(url, '_blank', 'width=600,height=400');
+    },
+
+    toLinkedIn: function (item) {
+        var content = Share.parseItem(item);
+        var url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(content.url);
+        window.open(url, '_blank', 'width=600,height=400');
+    },
+
+    toTelegram: function (item) {
+        var content = Share.parseItem(item);
+        var text = encodeURIComponent('分享《' + content.title + '》');
+        var url = 'https://t.me/share/url?url=' + encodeURIComponent(content.url) + '&text=' + text;
+        window.open(url, '_blank', 'width=600,height=400');
+    },
+
+    toWhatsApp: function (item) {
+        var content = Share.parseItem(item);
+        var text = encodeURIComponent('分享《' + content.title + '》 ' + content.url);
+        var url = 'https://api.whatsapp.com/send?text=' + text;
+        window.open(url, '_blank', 'width=600,height=400');
+    },
+
+    copyLink: function (item) {
+        var content = Share.parseItem(item);
+        var $btn = $(item);
+        var originalHtml = $btn.html();
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(content.url).then(function () {
+                Share._showCopyFeedback($btn, originalHtml);
+            }).catch(function () {
+                Share._fallbackCopy(content.url, $btn, originalHtml);
+            });
+        } else {
+            Share._fallbackCopy(content.url, $btn, originalHtml);
+        }
+    },
+
+    _fallbackCopy: function (url, $btn, originalHtml) {
+        var tempInput = document.createElement('input');
+        tempInput.value = url;
+        tempInput.style.position = 'fixed';
+        tempInput.style.left = '-9999px';
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+            document.execCommand('copy');
+            Share._showCopyFeedback($btn, originalHtml);
+        } catch (e) {
+            alert('复制失败，请手动复制链接');
+        }
+        document.body.removeChild(tempInput);
+    },
+
+    _showCopyFeedback: function ($btn, originalHtml) {
+        $btn.html('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>');
+        $btn.addClass('copied');
+        setTimeout(function () {
+            $btn.html(originalHtml);
+            $btn.removeClass('copied');
+        }, 2000);
+    },
+
+    showQRCode: function (item) {
+        var content = Share.parseItem(item);
+        var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=10&data=' + encodeURIComponent(content.url);
+        
+        var html = '<div class="share-qr-overlay" onclick="Share.closeQRCode(event)">' +
+            '<div class="share-qr-modal">' +
+                '<button class="share-qr-close" onclick="Share.closeQRCode(event, true)" aria-label="关闭">&times;</button>' +
+                '<h3>扫描二维码分享</h3>' +
+                '<img src="' + qrUrl + '" alt="分享二维码" />' +
+                '<p class="share-qr-url"></p>' +
+            '</div>' +
+        '</div>';
+        
+        $('body').append(html);
+        // 转义URL中的特殊字符用于显示
+        var displayUrl = content.url.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        $('body .share-qr-url').text(content.url);
+        $('body').css('overflow', 'hidden');
+    },
+
+    closeQRCode: function (event, force) {
+        if (force || $(event.target).hasClass('share-qr-overlay')) {
+            $('.share-qr-overlay').remove();
+            $('body').css('overflow', '');
+        }
     }
 };
 

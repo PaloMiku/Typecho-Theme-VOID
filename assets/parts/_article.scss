@@ -741,6 +741,203 @@ article {
     }
 }
 
+/* 现代分享栏 */
+.share-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.share-label {
+    font-size: 0.85rem;
+    color: $fadeColor;
+    .theme-dark & {
+        color: $td-textColor-dark;
+    }
+    margin-right: 0.25rem;
+    flex-shrink: 0;
+}
+
+.share-buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.06);
+    color: $fadeColor;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    padding: 0;
+    
+    .theme-dark & {
+        background: rgba(255, 255, 255, 0.08);
+        color: $td-textColor-dark;
+    }
+    
+    &:hover {
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:focus {
+        outline: none;
+    }
+    
+    svg, i {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+        line-height: 1;
+    }
+    
+    /* 各平台品牌色 */
+    &.share-btn-x:hover {
+        background: #000000;
+        .theme-dark & { background: #333333; }
+    }
+    &.share-btn-facebook:hover {
+        background: #1877F2;
+    }
+    &.share-btn-linkedin:hover {
+        background: #0A66C2;
+    }
+    &.share-btn-telegram:hover {
+        background: #26A5E4;
+    }
+    &.share-btn-whatsapp:hover {
+        background: #25D366;
+    }
+    &.share-btn-weibo:hover {
+        background: #E6162D;
+    }
+    &.share-btn-copy:hover {
+        background: #6c757d;
+    }
+    &.share-btn-qr:hover {
+        background: #6c757d;
+    }
+    
+    /* 复制成功反馈 */
+    &.copied {
+        background: #28a745 !important;
+        color: #fff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+}
+
+/* 二维码弹窗 */
+.share-qr-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: qrFadeIn 0.2s ease;
+    .theme-dark & {
+        background: rgba(0, 0, 0, 0.7);
+    }
+}
+
+.share-qr-modal {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    max-width: 280px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: qrSlideUp 0.3s ease;
+    .theme-dark & {
+        background: #1e1e1e;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    h3 {
+        margin: 0 0 1rem;
+        font-size: 1rem;
+        color: $textColor;
+        .theme-dark & {
+            color: $td-textColor;
+        }
+    }
+    
+    img {
+        display: block;
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+        border-radius: 0.5rem;
+    }
+    
+    .share-qr-url {
+        margin: 1rem 0 0;
+        font-size: 0.75rem;
+        color: $fadeColor;
+        word-break: break-all;
+        .theme-dark & {
+            color: $td-textColor-dark;
+        }
+    }
+}
+
+.share-qr-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: $fadeColor;
+    padding: 0.25rem;
+    transition: color 0.2s;
+    
+    &:hover {
+        color: $textColor;
+        .theme-dark & {
+            color: $td-textColor;
+        }
+    }
+}
+
+@keyframes qrFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes qrSlideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* 文章底部 Emoji Reaction 区 */
 .post-reactions{
     display: flex;
