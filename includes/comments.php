@@ -70,14 +70,14 @@ $this->widget('VOID_Widget_Comments_Archive', $parameter)->to($comments);
                     </p>
                     <div class="smiley-wrapper">
                         <div id="smiliesbox">
-                            <span class="smilies-item" data-tag="😂" onclick="VOID_Util.insertEmoji(this)">😂</span>
-                            <span class="smilies-item" data-tag="🤡" onclick="VOID_Util.insertEmoji(this)">🤡</span>
-                            <span class="smilies-item" data-tag="😎" onclick="VOID_Util.insertEmoji(this)">😎</span>
-                            <span class="smilies-item" data-tag="😡" onclick="VOID_Util.insertEmoji(this)">😡</span>
-                            <span class="smilies-item" data-tag="😁" onclick="VOID_Util.insertEmoji(this)">😁</span>
-                            <span class="smilies-item" data-tag="😋" onclick="VOID_Util.insertEmoji(this)">😋</span>
-                            <span class="smilies-item" data-tag="😭" onclick="VOID_Util.insertEmoji(this)">😭</span>
-                            <span class="smilies-item" data-tag="😑" onclick="VOID_Util.insertEmoji(this)">😑</span>
+                            <span class="smilies-item" data-tag="😂" data-action="insert-emoji">😂</span>
+                            <span class="smilies-item" data-tag="🤡" data-action="insert-emoji">🤡</span>
+                            <span class="smilies-item" data-tag="😎" data-action="insert-emoji">😎</span>
+                            <span class="smilies-item" data-tag="😡" data-action="insert-emoji">😡</span>
+                            <span class="smilies-item" data-tag="😁" data-action="insert-emoji">😁</span>
+                            <span class="smilies-item" data-tag="😋" data-action="insert-emoji">😋</span>
+                            <span class="smilies-item" data-tag="😭" data-action="insert-emoji">😭</span>
+                            <span class="smilies-item" data-tag="😑" data-action="insert-emoji">😑</span>
                         </div>
                     </div>
                     <p class="comment-buttons">

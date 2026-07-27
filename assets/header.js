@@ -668,12 +668,14 @@ VOID_Ui = {
         }
     });
 
-    // 面板事件委托：替代内联 onclick
-    $(document).on('click', '#ctrler-panel [data-action], #setting-panel [data-action], [data-action="toggle-setting-panel"]', function (e) {
+    // 全局事件委托：替代所有内联 onclick/onkeydown
+    // click 委托覆盖控制面板、设置面板及页面其余交互按钮
+    $(document).on('click', '[data-action]', function () {
         var $el = $(this);
         var action = $el.data('action');
 
         switch (action) {
+            // --- 控制面板 / 设置面板 ---
             case 'scroll-top':
                 VOID_SmoothScroller.scrollTo(0);
                 break;
@@ -702,6 +704,63 @@ VOID_Ui = {
             case 'remember-pos':
                 VOID_Ui.rememberPos();
                 break;
+            // --- 导航 / 搜索 ---
+            case 'toggle-nav':
+                VOID_Ui.toggleNav(this);
+                break;
+            case 'toggle-search':
+                VOID_Ui.toggleSearch(this);
+                break;
+            case 'start-search':
+                VOID.startSearch($el.data('target'));
+                break;
+            case 'scroll-to-comments':
+                VOID_Ui.scrollToWithHeader('#comments');
+                break;
+            case 'toggle-archive':
+                VOID_Ui.toggleArchive(this);
+                break;
+            case 'close-toc':
+                TOC.close();
+                break;
+            // --- 投票 / 表态 ---
+            case 'vote':
+                VOID_Vote.vote(this);
+                break;
+            case 'toggle-picker':
+                VOID_Vote.togglePicker(this);
+                break;
+            case 'react':
+                VOID_Vote.reaction(this, $el.data('emoji'), $el.data('table'), $el.data('cid'));
+                break;
+            case 'toggle-fold-comment':
+                VOID_Vote.toggleFoldComment($el.data('coid'), this);
+                break;
+            // --- 分享 ---
+            case 'share': {
+                var method = $el.data('method');
+                if (typeof Share[method] === 'function') {
+                    Share[method](this);
+                }
+                break;
+            }
+            // --- 评论表情 / 回复 ---
+            case 'insert-emoji':
+                VOID_Util.insertEmoji(this);
+                break;
+            case 'comment-reply':
+                AjaxComment.handleReplyClick($el.data('theid'), $el.data('coid'), this);
+                break;
+            case 'cancel-reply':
+                AjaxComment.cancelActiveReply();
+                break;
+        }
+    });
+
+    // keydown 委托：搜索框回车提交
+    $(document).on('keydown', '[data-action="enter-search"]', function (e) {
+        if (e.keyCode === 13) {
+            VOID.startSearch(this);
         }
     });
 })();

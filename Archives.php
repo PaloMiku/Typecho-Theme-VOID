@@ -74,10 +74,10 @@ if(!Utils::isPjax()){
                 <h2>
                     <span class="archive-year-title" data-tooltip="<?php echo htmlspecialchars($tooltip_text); ?>"><?php echo $year; ?></span>
                     <span class="num-posts"><?php echo $post_num; ?> 篇</span>
-                    <a no-pjax target="_self" data-num="<?php echo $post_num; ?>" 
-                        data-year="<?php echo $year; ?>" 
-                        class="toggle-archive" href="javascript:void(0);" 
-                        onclick="VOID_Ui.toggleArchive(this); return false;"><?php if($index > 0) echo '+'; else echo '-'; ?>
+                    <a no-pjax target="_self" data-num="<?php echo $post_num; ?>"
+                        data-year="<?php echo $year; ?>"
+                        class="toggle-archive" href="javascript:void(0);"
+                        data-action="toggle-archive"><?php if($index > 0) echo '+'; else echo '-'; ?>
                     </a>
                 </h2>
                 <section id="year-<?php echo $year; ?>" 

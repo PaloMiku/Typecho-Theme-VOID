@@ -222,8 +222,8 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
         <div class="comment-content yue">
             <?php if ($setting['VOIDPlugin'] && $dislikeCount >= $setting['commentFoldThreshold'][0]
             && ($dislikeCount >= $likeCount*$setting['commentFoldThreshold'][1])) { ?>
-                <span class="fold">[该评论已被自动折叠 | <a no-pjax target="_self" href="javascript:void(0)" 
-                onclick="VOID_Vote.toggleFoldComment(<?php echo $this->coid; ?>, this)">点击展开</a>]</span>
+                <span class="fold">[该评论已被自动折叠 | <a no-pjax target="_self" href="javascript:void(0)"
+                data-action="toggle-fold-comment" data-coid="<?php echo $this->coid; ?>">点击展开</a>]</span>
             <?php }?>
             <div class="comment-content-inner"><?php echo $this->content; ?></div>
         </div>
@@ -236,25 +236,25 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
                     if ($count > 0): ?>
                     <a no-pjax target="_self" class="reaction-btn comment-reaction vote-button"
                         href="javascript:void(0)"
-                        onclick="VOID_Vote.vote(this)"
+                        data-action="vote"
                         data-item-id="<?php echo $this->coid;?>"
                         data-type="<?php echo htmlspecialchars($emoji, ENT_QUOTES, 'UTF-8');?>"
                         data-table="comment"
                     ><?php echo $emoji; ?> <span class="count"><?php echo $count;?></span></a>
                 <?php endif; endforeach; ?>
                 <div class="reaction-add-wrapper">
-                    <button class="reaction-add-btn" type="button" onclick="VOID_Vote.togglePicker(this)" title="添加表态">
+                    <button class="reaction-add-btn" type="button" data-action="toggle-picker" title="添加表态">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11v1a10 10 0 1 1-9-10"></path><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 5h6"></path><path d="M19 2v6"></path></svg>
                     </button>
                     <div class="reaction-picker">
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👍', 'comment', <?php echo $this->coid;?>)">👍</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👎', 'comment', <?php echo $this->coid;?>)">👎</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🤡', 'comment', <?php echo $this->coid;?>)">🤡</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '❤️', 'comment', <?php echo $this->coid;?>)">❤️</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🔥', 'comment', <?php echo $this->coid;?>)">🔥</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👀', 'comment', <?php echo $this->coid;?>)">👀</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '😂', 'comment', <?php echo $this->coid;?>)">😂</span>
-                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🤔', 'comment', <?php echo $this->coid;?>)">🤔</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="👍" data-table="comment" data-cid="<?php echo $this->coid;?>">👍</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="👎" data-table="comment" data-cid="<?php echo $this->coid;?>">👎</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="🤡" data-table="comment" data-cid="<?php echo $this->coid;?>">🤡</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="❤️" data-table="comment" data-cid="<?php echo $this->coid;?>">❤️</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="🔥" data-table="comment" data-cid="<?php echo $this->coid;?>">🔥</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="👀" data-table="comment" data-cid="<?php echo $this->coid;?>">👀</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="😂" data-table="comment" data-cid="<?php echo $this->coid;?>">😂</span>
+                        <span class="reaction-picker-emoji" data-action="react" data-emoji="🤔" data-table="comment" data-cid="<?php echo $this->coid;?>">🤔</span>
                     </div>
                 </div>
             </div>
@@ -901,8 +901,8 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
                     '" data-comment-coid="' . $this->coid .
                     '" data-reply-word="' . htmlspecialchars((string)$word, ENT_QUOTES, 'UTF-8') .
                     '" data-cancel-word="' . htmlspecialchars($cancelWord, ENT_QUOTES, 'UTF-8') .
-                    '" data-reply-state="idle" aria-pressed="false" onclick="return AjaxComment.handleReplyClick(\'' .
-                    $this->theId . '\', ' . $this->coid . ', this);">' . $word . '</a>';
+                    '" data-reply-state="idle" aria-pressed="false" data-action="comment-reply" data-theid="' .
+                    $this->theId . '" data-coid="' . $this->coid . '">' . $word . '</a>';
             }
         }
     }
@@ -924,7 +924,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
                 // 兼容 Typecho 1.3：改为 get() 读取，避免使用已弃用的 request magic 属性
                 $replyId = $this->request->filter('int')->get('replyTo');
                 echo '<a id="cancel-comment-reply-link" href="' . (string)$this->getParentContentField('permalink', '') . '#' . $this->parameter->respondId .
-                '" rel="nofollow"' . ($replyId ? '' : ' style="display:none"') . ' onclick="return AjaxComment.cancelActiveReply();">' . $word . '</a>';
+                '" rel="nofollow"' . ($replyId ? '' : ' style="display:none"') . ' data-action="cancel-reply">' . $word . '</a>';
             }
         }
     }
