@@ -18,12 +18,12 @@ Class Contents
     /**
      * 根据 cid 返回文章对象
      * 
-     * @return Widget_Abstract_Contents
+     * @return Widget\Base\Contents
      */
     public static function getPost($cid)
     {
-        $db = Typecho_Db::get();
-        $post = Widget_Abstract_Contents::alloc();
+        $db = Typecho\Db::get();
+        $post = Widget\Base\Contents::alloc();
         $db->fetchRow($post->select()
             ->where("cid = ?", $cid)
             ->limit(1),
@@ -34,12 +34,12 @@ Class Contents
     /**
      * 根据 cid 返回评论对象
      * 
-     * @return Widget_Abstract_Comments
+     * @return Widget\Base\Comments
      */
     public static function getComment($coid)
     {
-        $db = Typecho_Db::get();
-        $comment = Widget_Abstract_Comments::alloc();
+        $db = Typecho\Db::get();
+        $comment = Widget\Base\Comments::alloc();
         $db->fetchRow($comment->select()
             ->where("coid = ?", $coid)
             ->limit(1),
@@ -50,12 +50,12 @@ Class Contents
     /**
      * 根据 mid 返回 meta 对象
      * 
-     * @return Widget_Abstract_Metas
+     * @return Widget\Base\Metas
      */
     public static function getMeta($mid)
     {
-        $db = Typecho_Db::get();
-        $meta = Widget_Abstract_Metas::alloc();
+        $db = Typecho\Db::get();
+        $meta = Widget\Base\Metas::alloc();
         $db->fetchRow($meta->select()
             ->where("mid = ?", $mid)
             ->limit(1),
@@ -68,7 +68,7 @@ Class Contents
      * 
      * @return void
      */
-    public static function title(Widget_Archive $archive)
+    public static function title(Widget\Archive $archive)
     {
         $archive->archiveTitle(array(
             'category'  =>  '分类 %s 下的文章',
@@ -813,11 +813,11 @@ Class Contents
     {
         $output = array();
 
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $rows = $db->fetchAll($db->select()->from('table.comments')->where('table.comments.status = ?', 'approved')
         ->where('type = ?', 'comment')
         ->where('ownerId <> authorId')
-        ->order('table.comments.created', Typecho_Db::SORT_DESC)
+        ->order('table.comments.created', Typecho\Db::SORT_DESC)
         ->limit($num));
 
         foreach ($rows as $row) {
@@ -837,12 +837,12 @@ Class Contents
      */
     public static function thePrev($archive)
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $content = $db->fetchRow($db->select()->from('table.contents')->where('table.contents.created < ?', $archive->created)
             ->where('table.contents.status = ?', 'publish')
             ->where('table.contents.type = ?', $archive->type)
             ->where('table.contents.password IS NULL')
-            ->order('table.contents.created', Typecho_Db::SORT_DESC)
+            ->order('table.contents.created', Typecho\Db::SORT_DESC)
             ->limit(1));
 
         if ($content) {
@@ -857,7 +857,7 @@ Class Contents
      */
     public static function theNext($archive)
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $currentTime = (class_exists('Typecho_Date') && method_exists('Typecho_Date', 'time'))
             ? Typecho_Date::time()
             : time();
@@ -867,7 +867,7 @@ Class Contents
             ->where('table.contents.status = ?', 'publish')
             ->where('table.contents.type = ?', $archive->type)
             ->where('table.contents.password IS NULL')
-            ->order('table.contents.created', Typecho_Db::SORT_ASC)
+            ->order('table.contents.created', Typecho\Db::SORT_ASC)
             ->limit(1));
 
         if ($content) {
@@ -884,10 +884,10 @@ Class Contents
      */
     public static function archives($widget, $excerpt = false)
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $rows = $db->fetchAll($db->select()
                     ->from('table.contents')
-                    ->order('table.contents.created', Typecho_Db::SORT_DESC)
+                    ->order('table.contents.created', Typecho\Db::SORT_DESC)
                     ->where('table.contents.type = ?', 'post')
                     ->where('table.contents.status = ?', 'publish')
                     ->where('table.contents.created < ?', time()));
@@ -895,7 +895,7 @@ Class Contents
         $stat = array();
         foreach ($rows as $row) {
             // 用文章自身的内容组件计算 permalink，避免归档页上下文把链接统一解析成当前归档地址。
-            $post = Widget_Abstract_Contents::alloc();
+            $post = Widget\Base\Contents::alloc();
             $row = $post->push($row);
             $arr = array(
                 'title' => $row['title'],
@@ -921,7 +921,7 @@ Class Contents
      */
     public static function getTags($cid)
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $rows = $db->fetchAll($db->select('mid')
             ->from('table.relationships')
             ->where("cid = ?", $cid));
@@ -946,7 +946,7 @@ Class Contents
      */
     public static function getCategories($cid)
     {
-        $rows = Widget_Metas_Category_Related::allocWithAlias($cid, array('cid' => $cid))
+        $rows = Widget\Metas\Category\Related::allocWithAlias($cid, array('cid' => $cid))
             ->toArray(array('name', 'permalink'));
         
         $metas = array();

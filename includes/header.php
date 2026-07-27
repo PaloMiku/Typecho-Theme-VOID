@@ -55,10 +55,10 @@ if($this->is('post') || $this->is('page')) {
                 </a>
                 <a class="brand" href="<?php Utils::index(''); ?>"><?php if($setting['name']) echo $setting['name']; else echo $this->options->title; ?></a>
                 <a href="<?php Utils::index(''); ?>">首页</a>
-                <?php $this->widget('Widget_Contents_Page_List')->parse('<a href="{permalink}">{title}</a>'); ?>
+                <?php $this->widget('Widget\Contents\Page\Rows')->parse('<a href="{permalink}">{title}</a>'); ?>
                 <span class="dropdown">分类
                     <ul>
-                        <?php $this->widget('Widget_Metas_Category_List')->parse('<li><a href="{permalink}">{name}</a></li>'); ?>
+                        <?php $this->widget('Widget\Metas\Category\Rows')->parse('<li><a href="{permalink}">{name}</a></li>'); ?>
                     </ul>
                 </span>
                 <?php if($setting['nav']){ foreach ($setting['nav'] as $listItem): ?>
@@ -98,12 +98,12 @@ if($this->is('post') || $this->is('page')) {
     <div id="nav-mobile">
         <section id="pages" data-title="PAGES">
             <nav>
-                <?php $this->widget('Widget_Contents_Page_List')->parse('<a href="{permalink}">{title}</a>'); ?>
+                <?php $this->widget('Widget\Contents\Page\Rows')->parse('<a href="{permalink}">{title}</a>'); ?>
             </nav>
         </section>
         <section id="categories" data-title="CATEGORIES">
             <nav>
-                <?php $this->widget('Widget_Metas_Category_List')->parse('<a href="{permalink}">{name}</a>'); ?>
+                <?php $this->widget('Widget\Metas\Category\Rows')->parse('<a href="{permalink}">{name}</a>'); ?>
             </nav>
         </section>
         <?php if($setting['nav']){ foreach ($setting['nav'] as $listItem): ?>

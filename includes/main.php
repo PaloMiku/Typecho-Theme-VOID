@@ -45,7 +45,7 @@ $setting = $GLOBALS['VOIDSetting'];
                         // 从 votes 表聚合文章的 emoji 反应计数
                         $postReactions = array();
                         try {
-                            $_db = Typecho_Db::get();
+                            $_db = Typecho\Db::get();
                             $_rows = $_db->fetchAll($_db->select('type', 'COUNT(*) AS cnt')
                                 ->from('table.votes')
                                 ->where('id = ?', $this->cid)

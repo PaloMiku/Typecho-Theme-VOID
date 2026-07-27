@@ -70,7 +70,7 @@ class Utils
      */
     public static function isPluginAvailable($name) 
     {
-        $plugins = Typecho_Plugin::export();
+        $plugins = Typecho\Plugin::export();
         $plugins = $plugins['activated'];
         return is_array($plugins) && array_key_exists($name, $plugins);
     }
@@ -201,11 +201,11 @@ class Utils
      */
     public static function getBuildTime()
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $content = $db->fetchRow($db->select()->from('table.contents')
             ->where('table.contents.status = ?', 'publish')
             ->where('table.contents.password IS NULL')
-            ->order('table.contents.created', Typecho_Db::SORT_ASC)
+            ->order('table.contents.created', Typecho\Db::SORT_ASC)
             ->limit(1));
         if (count($content))
             echo date('Y-m-d\TH:i', $content['created']);
@@ -220,7 +220,7 @@ class Utils
      */
     public static function getPostNum()
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         return $db->fetchObject($db->select(array('COUNT(cid)' => 'num'))
                     ->from('table.contents')
                     ->where('table.contents.type = ?', 'post')
@@ -234,7 +234,7 @@ class Utils
      */
     public static function getCatNum()
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         return $db->fetchObject($db->select(array('COUNT(mid)' => 'num'))
                     ->from('table.metas')
                     ->where('table.metas.type = ?', 'category'))->num;
@@ -247,7 +247,7 @@ class Utils
      */
     public static function getTagNum()
     {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         return $db->fetchObject($db->select(array('COUNT(mid)' => 'num'))
                     ->from('table.metas')
                     ->where('table.metas.type = ?', 'tag'))->num;

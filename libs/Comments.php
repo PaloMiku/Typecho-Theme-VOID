@@ -18,7 +18,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * @copyright Copyright (c) 2008 Typecho team (http://www.typecho.org)
  * @license GNU General Public License 2.0
  */
-class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
+class VOID_Widget_Comments_Archive extends Widget\Base\Comments
 {
      /**
      * 当前页
@@ -144,7 +144,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
         parent::__construct($request, $response, $params);
         $this->parameter->setDefault('parentId=0&commentPage=0&commentsNum=0&allowComment=1');
         
-        Typecho_Widget::widget('Widget_Security')->to($this->_security);
+        Typecho\Widget::widget('Widget\Security')->to($this->_security);
 
         /** 初始化回调函数 */
         if (function_exists('threadedComments')) {
@@ -295,7 +295,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
         }
 
         if ($author === '') {
-            $db = Typecho_Db::get();
+            $db = Typecho\Db::get();
             $parentRow = $db->fetchRow($db->select('author')->from('table.comments')->where('coid = ?', $parentId));
             if (is_array($parentRow) && !empty($parentRow['author'])) {
                 $author = trim((string)$parentRow['author']);
@@ -315,7 +315,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
      * 获取评论赞踩
      */
     private function getLikesAndDislikes() {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $row = $db->fetchRow($db->select('likes, dislikes')
             ->from('table.comments')
             ->where('coid = ?', $this->coid));
@@ -327,7 +327,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
      * 返回 ['👍' => 3, '❤️' => 1, ...]
      */
     private function getReactions() {
-        $db = Typecho_Db::get();
+        $db = Typecho\Db::get();
         $rows = $db->fetchAll($db->select('type', 'COUNT(*) AS cnt')
             ->from('table.votes')
             ->where('id = ?', $this->coid)
@@ -443,7 +443,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
         }
 
         // 对齐 Typecho 1.3：仅显示已审核评论 + 当前访客自己的待审核评论
-        $unapprovedCommentId = intval(Typecho_Cookie::get('__typecho_unapproved_comment', 0));
+        $unapprovedCommentId = intval(Typecho\Cookie::get('__typecho_unapproved_comment', 0));
         $select = $this->select()->where('table.comments.cid = ?', $this->parameter->parentId)
             ->where(
                 'table.comments.status = ? OR (table.comments.coid = ? AND table.comments.status <> ?)',
@@ -590,7 +590,7 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
             ), $this->options->index);
 
             /** 使用盒状分页 */
-            $nav = new Typecho_Widget_Helper_PageNavigator_Box($this->_total,
+            $nav = new Typecho\Widget\Helper\PageNavigator\Box($this->_total,
                 $this->_currentPage, $this->options->commentsPageSize, $query);
             $nav->setPageHolder('commentPage');
             $nav->setAnchor('comments');

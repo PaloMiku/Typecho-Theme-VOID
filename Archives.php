@@ -28,7 +28,7 @@ if(!Utils::isPjax()){
     <div class="wrapper container narrow">
         <div class="tag-cloud yue float-up">
             <h2>Tags</h2>
-            <?php $this->widget('Widget_Metas_Tag_Cloud', 'sort=count&ignoreZeroCount=1&desc=1&limit=50')->to($tags); ?>
+            <?php $this->widget('Widget\Metas\Tag\Cloud', 'sort=count&ignoreZeroCount=1&desc=1&limit=50')->to($tags); ?>
             <?php if($tags->have()): ?>
             <?php while ($tags->next()): ?>
                 <a href="<?php $tags->permalink(); ?>" rel="tag" class="tag-item" title="<?php $tags->count(); ?> 个话题"><?php $tags->name(); ?></a>

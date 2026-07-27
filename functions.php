@@ -19,52 +19,11 @@ require_once('libs/Contents.php');
 require_once('libs/Comments.php');
 
 /**
- * 统一 Typecho 1.2 / 1.3 的插件句柄格式，避免别名导致重复注册。
- */
-function VOID_normalizePluginHandle($handle)
-{
-    if (defined('__TYPECHO_CLASS_ALIASES__')) {
-        $alias = array_search('\\' . ltrim($handle, '\\'), __TYPECHO_CLASS_ALIASES__, true);
-        if (false !== $alias) {
-            $handle = $alias;
-        }
-    }
-
-    if (class_exists('Typecho\\Common')) {
-        return Typecho\Common::nativeClassName($handle);
-    }
-
-    return trim(str_replace('\\', '_', $handle), '_');
-}
-
-/**
- * 为内容解析相关 hook 同时兼容旧版别名和 1.3 命名空间类。
- */
-function VOID_registerContentsHook($component, $callback)
-{
-    $targets = array('Widget_Abstract_Contents');
-    if (class_exists('Widget\Base\Contents')) {
-        $targets[] = 'Widget\Base\Contents';
-    }
-
-    $registered = array();
-    foreach ($targets as $target) {
-        $normalized = VOID_normalizePluginHandle($target);
-        if (isset($registered[$normalized])) {
-            continue;
-        }
-
-        Typecho_Plugin::factory($target)->{$component} = $callback;
-        $registered[$normalized] = true;
-    }
-}
-
-/**
  * 清理当前文章已缓存的计算字段，避免 Typecho 1.3 在主题 hook 注册前缓存旧内容。
  */
 function VOID_refreshArchiveComputedFields($archive)
 {
-    if (!($archive instanceof Widget_Archive) || !$archive->have()) {
+    if (!($archive instanceof Widget\Archive) || !$archive->have()) {
         return;
     }
 
@@ -90,12 +49,12 @@ function VOID_refreshArchiveComputedFields($archive)
     $archive->archiveDescription = $archive->plainExcerpt;
 }
 
-Typecho_Plugin::factory('admin/write-post.php')->bottom = array('Utils', 'addButton');
-Typecho_Plugin::factory('admin/write-page.php')->bottom = array('Utils', 'addButton');
+Typecho\Plugin::factory('admin/write-post.php')->bottom = array('Utils', 'addButton');
+Typecho\Plugin::factory('admin/write-page.php')->bottom = array('Utils', 'addButton');
 // 为防止友链解析与 Markdown 冲突，重写 Markdown 函数
-VOID_registerContentsHook('markdown', array('Contents', 'markdown'));
-VOID_registerContentsHook('contentEx', array('Contents', 'contentEx'));
-VOID_registerContentsHook('excerptEx', array('Contents', 'excerptEx'));
+Typecho\Plugin::factory('Widget\Base\Contents')->markdown = array('Contents', 'markdown');
+Typecho\Plugin::factory('Widget\Base\Contents')->contentEx = array('Contents', 'contentEx');
+Typecho\Plugin::factory('Widget\Base\Contents')->excerptEx = array('Contents', 'excerptEx');
 
 /**
  * 主题启用
@@ -134,69 +93,69 @@ function themeConfig($form)
     echo '<script>var VOIDVersion='.$GLOBALS['VOIDVersion'].'</script>';
     echo '<script src="'.Helper::options()->themeUrl.'/assets/check_update.js"></script>';
 
-    $defaultBanner = new Typecho_Widget_Helper_Form_Element_Text('defaultBanner', null, '', '首页顶部大图', '可以填写随机图 API。');
+    $defaultBanner = new Typecho\Widget\Helper\Form\Element\Text('defaultBanner', null, '', '首页顶部大图', '可以填写随机图 API。');
     $form->addInput($defaultBanner);
-    $indexBannerTitle = new Typecho_Widget_Helper_Form_Element_Text('indexBannerTitle', null, '', '首页顶部大标题', '不要太长');
+    $indexBannerTitle = new Typecho\Widget\Helper\Form\Element\Text('indexBannerTitle', null, '', '首页顶部大标题', '不要太长');
     $form->addInput($indexBannerTitle);
-    $indexBannerSubtitle = new Typecho_Widget_Helper_Form_Element_Text('indexBannerSubtitle', null, '', '首页顶部小标题', '');
+    $indexBannerSubtitle = new Typecho\Widget\Helper\Form\Element\Text('indexBannerSubtitle', null, '', '首页顶部小标题', '');
     $form->addInput($indexBannerSubtitle);
 
-    $colorScheme = new Typecho_Widget_Helper_Form_Element_Radio('colorScheme', array('0' => '自动切换', '1' => '日间模式', '2' => '夜间模式'), '0', '主题颜色模式', '选择主题颜色模式。自动模式下每天 22:00 到次日 06:59 会显示为夜间模式。');
+    $colorScheme = new Typecho\Widget\Helper\Form\Element\Radio('colorScheme', array('0' => '自动切换', '1' => '日间模式', '2' => '夜间模式'), '0', '主题颜色模式', '选择主题颜色模式。自动模式下每天 22:00 到次日 06:59 会显示为夜间模式。');
     $form->addInput($colorScheme);
 
-    $indexStyle = new Typecho_Widget_Helper_Form_Element_Radio('indexStyle', array(
+    $indexStyle = new Typecho\Widget\Helper\Form\Element\Radio('indexStyle', array(
         '0' => '双栏',
         '1' => '单栏'), '0', '首页版式', '选择单栏或者双栏瀑布流');
     $form->addInput($indexStyle);
 
     // 高级设置
-    $reward = new Typecho_Widget_Helper_Form_Element_Text('reward', null, '', '打赏二维码', '图片链接，只允许一张图片，更多请自行合成。');
+    $reward = new Typecho\Widget\Helper\Form\Element\Text('reward', null, '', '打赏二维码', '图片链接，只允许一张图片，更多请自行合成。');
     $form->addInput($reward);
-    $serifincontent = new Typecho_Widget_Helper_Form_Element_Radio('serifincontent', array('0' => '不启用', '1' => '启用'), '0', '文章内容使用衬线体', '是否对文章内容启用衬线体（思源宋体）。此服务由 Google Fonts 提供，可能会有加载较慢的情况。');
+    $serifincontent = new Typecho\Widget\Helper\Form\Element\Radio('serifincontent', array('0' => '不启用', '1' => '启用'), '0', '文章内容使用衬线体', '是否对文章内容启用衬线体（思源宋体）。此服务由 Google Fonts 提供，可能会有加载较慢的情况。');
     $form->addInput($serifincontent);
-    $lazyload = new Typecho_Widget_Helper_Form_Element_Radio('lazyload', array('1' => '启用', '0' => '不启用'), '1', '图片懒加载', '是否启用图片懒加载。');
+    $lazyload = new Typecho\Widget\Helper\Form\Element\Radio('lazyload', array('1' => '启用', '0' => '不启用'), '1', '图片懒加载', '是否启用图片懒加载。');
     $form->addInput($lazyload);
-    $enableMath = new Typecho_Widget_Helper_Form_Element_Radio('enableMath', array('0' => '不启用', '1' => '启用'), '0', '启用数学公式解析', '是否启用数学公式解析（MathJax 4）。启用后会额外加载约 1~3M 的资源。');
+    $enableMath = new Typecho\Widget\Helper\Form\Element\Radio('enableMath', array('0' => '不启用', '1' => '启用'), '0', '启用数学公式解析', '是否启用数学公式解析（MathJax 4）。启用后会额外加载约 1~3M 的资源。');
     $form->addInput($enableMath);
-    $head = new Typecho_Widget_Helper_Form_Element_Textarea('head', null, '', 'head 标签输出内容', '统计代码等。');
+    $head = new Typecho\Widget\Helper\Form\Element\Textarea('head', null, '', 'head 标签输出内容', '统计代码等。');
     $form->addInput($head);
-    $footer = new Typecho_Widget_Helper_Form_Element_Textarea('footer', null, '', 'footer 标签输出内容', '备案号等。');
+    $footer = new Typecho\Widget\Helper\Form\Element\Textarea('footer', null, '', 'footer 标签输出内容', '备案号等。');
     $form->addInput($footer);
-    $pjax = new Typecho_Widget_Helper_Form_Element_Radio('pjax', array('0' => '不启用', '1' => '启用'), '0', '启用 PJAX (BETA)', '是否启用 PJAX。如果你发现站点有点不对劲，又不知道这个选项是啥意思，请关闭此项。');
+    $pjax = new Typecho\Widget\Helper\Form\Element\Radio('pjax', array('0' => '不启用', '1' => '启用'), '0', '启用 PJAX (BETA)', '是否启用 PJAX。如果你发现站点有点不对劲，又不知道这个选项是啥意思，请关闭此项。');
     $form->addInput($pjax);
-    $pjaxreload = new Typecho_Widget_Helper_Form_Element_Textarea('pjaxreload', null, null, 'PJAX 重载函数', '输入要重载的 JS，如果你发现站点有点不对劲，又不知道这个选项是啥意思，请关闭 PJAX 并留空此项。');
+    $pjaxreload = new Typecho\Widget\Helper\Form\Element\Textarea('pjaxreload', null, null, 'PJAX 重载函数', '输入要重载的 JS，如果你发现站点有点不对劲，又不知道这个选项是啥意思，请关闭 PJAX 并留空此项。');
     $form->addInput($pjaxreload);
 
     // 超高级设置
-    $advance = new Typecho_Widget_Helper_Form_Element_Textarea('advance', null, null, '超高级设置', '主题中包含一份 advanceSetting.sample.json，自己仿照着写吧。');
+    $advance = new Typecho\Widget\Helper\Form\Element\Textarea('advance', null, null, '超高级设置', '主题中包含一份 advanceSetting.sample.json，自己仿照着写吧。');
     $form->addInput($advance);
 }
 
 /**
  * 文章自定义字段
  */
-function themeFields(Typecho_Widget_Helper_Layout $layout)
+function themeFields(Typecho\Widget\Helper\Layout $layout)
 {
-    $excerpt = new Typecho_Widget_Helper_Form_Element_Textarea('excerpt', null, null, '文章摘要', '输入自定义摘要。留空自动从文章截取。');
+    $excerpt = new Typecho\Widget\Helper\Form\Element\Textarea('excerpt', null, null, '文章摘要', '输入自定义摘要。留空自动从文章截取。');
     $layout->addItem($excerpt);
-    $banner = new Typecho_Widget_Helper_Form_Element_Text('banner', null, null, '文章主图', '输入图片URL，该图片会用于主页文章列表的显示。');
+    $banner = new Typecho\Widget\Helper\Form\Element\Text('banner', null, null, '文章主图', '输入图片URL，该图片会用于主页文章列表的显示。');
     $layout->addItem($banner);
-    $bannerSource = new Typecho_Widget_Helper_Form_Element_Text('bannerSource', null, null, '主图来源', '输入来源信息，该信息会显示在文章题图下方。支持 markdown 格式。');
+    $bannerSource = new Typecho\Widget\Helper\Form\Element\Text('bannerSource', null, null, '主图来源', '输入来源信息，该信息会显示在文章题图下方。支持 markdown 格式。');
     $layout->addItem($bannerSource);
-    $bannerStyle = new Typecho_Widget_Helper_Form_Element_Select('bannerStyle', array(
+    $bannerStyle = new Typecho\Widget\Helper\Form\Element\Select('bannerStyle', array(
         0 => '显示在顶部',
         1 => '显示在顶部并添加模糊效果',
         2 => '不显示'), 0, '文章主图样式', '');
     $layout->addItem($bannerStyle);
-    $bannerascover = new Typecho_Widget_Helper_Form_Element_Select('bannerascover', array('1' => '主图显示在标题上方', '2' => '主图作为标题背景', '0' => '不显示'), '1', '首页主图样式', '主图作为标题背景时会添加暗色遮罩，但仍然建议仅对暗色的主图采用该方式展示。否则请选择「主图显示在标题上方」。');
+    $bannerascover = new Typecho\Widget\Helper\Form\Element\Select('bannerascover', array('1' => '主图显示在标题上方', '2' => '主图作为标题背景', '0' => '不显示'), '1', '首页主图样式', '主图作为标题背景时会添加暗色遮罩，但仍然建议仅对暗色的主图采用该方式展示。否则请选择「主图显示在标题上方」。');
     $layout->addItem($bannerascover);
-    $posttype = new Typecho_Widget_Helper_Form_Element_Select('posttype', array('0' => '一般文章', '1' => '封面文章'), '0', '文章类型', '选择展示方式');
+    $posttype = new Typecho\Widget\Helper\Form\Element\Select('posttype', array('0' => '一般文章', '1' => '封面文章'), '0', '文章类型', '选择展示方式');
     $layout->addItem($posttype);
-    $showfullcontent = new Typecho_Widget_Helper_Form_Element_Select('showfullcontent', array('0' => '否', '1' => '是'), '0', '在首页显示完整内容', '是否在首页展示完整内容。适合比较短的文章。');
+    $showfullcontent = new Typecho\Widget\Helper\Form\Element\Select('showfullcontent', array('0' => '否', '1' => '是'), '0', '在首页显示完整内容', '是否在首页展示完整内容。适合比较短的文章。');
     $layout->addItem($showfullcontent);
-    $showTOC = new Typecho_Widget_Helper_Form_Element_Select('showTOC', array('0' => '不显示目录', '1' => '显示目录'), '0', '文章目录', '是否显示文章目录。');
+    $showTOC = new Typecho\Widget\Helper\Form\Element\Select('showTOC', array('0' => '不显示目录', '1' => '显示目录'), '0', '文章目录', '是否显示文章目录。');
     $layout->addItem($showTOC);
-    $showOutdated = new Typecho_Widget_Helper_Form_Element_Select('showOutdated', array('0' => '不显示', '1' => '显示'), '0', '过时提示', '控制文章正文顶部是否显示过时提醒');
+    $showOutdated = new Typecho\Widget\Helper\Form\Element\Select('showOutdated', array('0' => '不显示', '1' => '显示'), '0', '过时提示', '控制文章正文顶部是否显示过时提醒');
     $layout->addItem($showOutdated);
 }
 
