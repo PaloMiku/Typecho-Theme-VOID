@@ -1,5 +1,20 @@
 /* eslint-disable no-undef */
 
+// 从 <script type="application/json" id="void-config"> 安全读取前端配置
+// 由 head.php 通过 json_encode 输出，避免字符串拼接注入风险
+(function () {
+    var configEl = document.getElementById('void-config');
+    if (configEl) {
+        try {
+            window.VOIDConfig = JSON.parse(configEl.textContent);
+        } catch(e) {
+            window.VOIDConfig = {};
+        }
+    } else {
+        window.VOIDConfig = {};
+    }
+})();
+
 TOC = {
     toggle: function () {
         $('body').toggleClass('sidebar-show');

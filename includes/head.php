@@ -20,13 +20,13 @@ if (isset($_POST['void_action'])) {
 }
 ?>
 <!DOCTYPE HTML>
-<html>
+<html lang="zh-CN">
     <head>
     <meta charset="<?php $this->options->charset(); ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="HandheldFriendly" content="true">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php 
     $banner = '';
     $description = '';
@@ -64,34 +64,42 @@ if (isset($_POST['void_action'])) {
 
     <!--JS-->
     <script src="<?php Utils::indexTheme('/assets/bundle-header.js'); ?>"></script>
-    <script>
-    VOIDConfig = {
-        PJAX : <?php echo $setting['pjax'] ? 'true' : 'false'; ?>,
-        searchBase : "<?php Utils::index("/search/"); ?>",
-        home: "<?php Utils::index("/"); ?>",
-        buildTime : "<?php Utils::getBuildTime(); ?>",
-        enableMath : <?php echo $setting['enableMath'] ? 'true' : 'false'; ?>,
-        lazyload : <?php echo $setting['lazyload'] ? 'true' : 'false'; ?>,
-        colorScheme:  <?php echo $setting['colorScheme']; ?>,
-        headerMode: <?php echo $setting['headerMode']; ?>,
-        followSystemColorScheme: <?php echo $setting['followSystemColorScheme'] ? 'true' : 'false'; ?>,
-        browserLevelLoadingLazy: <?php echo $setting['browserLevelLoadingLazy'] ? 'true' : 'false'; ?>,
-        VOIDPlugin: <?php echo $setting['VOIDPlugin'] ? 'true' : 'false'; ?>,
-        votePath: "<?php Utils::index('/action/void?'); ?>",
-        lightBg: "",
-        darkBg: "",
-        lineNumbers: <?php echo $setting['lineNumbers'] ? 'true' : 'false'; ?>,
-        darkModeTime: {
-            'start': <?php echo $setting['darkModeTime']['start']; ?>,
-            'end': <?php echo $setting['darkModeTime']['end']; ?>
-        },
-        horizontalBg: <?php echo empty($setting['siteBg']) ? 'false' : 'true'; ?>,
-        verticalBg: <?php echo empty($setting['siteBgVertical']) ? 'false' : 'true'; ?>,
-        indexStyle: <?php echo $setting['indexStyle']; ?>,
-        version: <?php echo $GLOBALS['VOIDVersion'] ?>,
-        isDev: true
-    }
-    </script>
+    <?php
+    // 安全注入前端配置：通过 JSON 输出，避免字符串拼接导致的 XSS 风险
+    // Utils::index / getBuildTime 为 echo 函数，用输出缓冲捕获其返回值
+    $voidCapture = function ($fn) {
+        ob_start();
+        $fn();
+        return ob_get_clean();
+    };
+    $voidConfig = array(
+        'PJAX'                    => (bool)$setting['pjax'],
+        'searchBase'              => $voidCapture(function () { Utils::index('/search/'); }),
+        'home'                    => $voidCapture(function () { Utils::index('/'); }),
+        'buildTime'               => $voidCapture(function () { Utils::getBuildTime(); }),
+        'enableMath'              => (bool)$setting['enableMath'],
+        'lazyload'                => (bool)$setting['lazyload'],
+        'colorScheme'             => (int)$setting['colorScheme'],
+        'headerMode'              => (int)$setting['headerMode'],
+        'followSystemColorScheme' => (bool)$setting['followSystemColorScheme'],
+        'browserLevelLoadingLazy' => (bool)$setting['browserLevelLoadingLazy'],
+        'VOIDPlugin'              => (bool)$setting['VOIDPlugin'],
+        'votePath'                => $voidCapture(function () { Utils::index('/action/void?'); }),
+        'lightBg'                 => '',
+        'darkBg'                  => '',
+        'lineNumbers'             => (bool)$setting['lineNumbers'],
+        'darkModeTime'            => array(
+            'start' => (float)$setting['darkModeTime']['start'],
+            'end'   => (float)$setting['darkModeTime']['end'],
+        ),
+        'horizontalBg'            => !empty($setting['siteBg']),
+        'verticalBg'              => !empty($setting['siteBgVertical']),
+        'indexStyle'              => (int)$setting['indexStyle'],
+        'version'                 => (int)$GLOBALS['VOIDVersion'],
+        'isDev'                   => true,
+    );
+    ?>
+    <script type="application/json" id="void-config"><?php echo json_encode($voidConfig, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
     <script src="<?php Utils::indexTheme('/assets/header.js'); ?>"></script>
     
     <?php echo $setting['head']; ?>
