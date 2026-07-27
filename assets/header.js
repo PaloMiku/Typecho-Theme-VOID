@@ -17,15 +17,22 @@
 
 TOC = {
     toggle: function () {
-        $('body').toggleClass('sidebar-show');
+        // 桌面端：切换隐藏状态（淡出动画）
+        if (window.innerWidth >= 1200) {
+            $('body').toggleClass('toc-hidden');
+        } else {
+            // 移动端：切换浮动面板
+            $('.TOC').toggleClass('toc-open');
+        }
     },
 
     close: function () {
-        $('body').removeClass('sidebar-show');
+        $('body').removeClass('toc-hidden');
+        $('.TOC').removeClass('toc-open');
     },
 
     open: function () {
-        $('body').addClass('sidebar-show');
+        $('body').removeClass('toc-hidden');
     }
 };
 
@@ -529,6 +536,7 @@ VOID_Ui = {
         }
         $('#nav-mobile').fadeOut(200);
         TOC.close();
+        $('.toc-floating-btn').remove();
         if ($('.TOC').length > 0) {
             tocbot.destroy();
         }

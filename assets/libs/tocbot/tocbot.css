@@ -1,52 +1,54 @@
+/* tocbot base styles - VOID theme overrides */
+/* 极简重置，主题样式由 _article.scss 控制 */
+
 .toc {
-	overflow-y: auto
+    overflow-y: auto;
 }
 
-.toc>.toc-list {
-	overflow: hidden;
+.toc > .toc-list {
+    overflow: hidden;
     position: relative;
     list-style: none;
 }
 
-.toc>.toc-list li {
-	list-style: none
+.toc > .toc-list li {
+    list-style: none;
 }
 
 .toc-list {
-	margin: 0;
+    margin: 0;
     padding-left: 0;
     list-style: none;
-    line-height: 2.1;
+    line-height: 1.4;
 }
 
-.toc-list .toc-list{
-	padding-left: 1rem;
+.toc-list .toc-list {
+    padding-left: 1rem;
 }
 
 a.toc-link {
-	color: currentColor;
+    color: currentColor;
     height: 100%;
+    text-decoration: none;
 }
 
+/* 禁用默认折叠动画（VOID 不使用折叠） */
 .is-collapsible {
-	max-height: 1000px;
-	overflow: hidden;
-	transition: all 300ms ease-in-out
+    max-height: none;
+    overflow: visible;
+    transition: none;
 }
 
 .is-collapsed {
-	max-height: 0
-}
-
-.is-collapsed:has(:focus) {
-	max-height: 1000px;
+    max-height: none;
 }
 
 .is-position-fixed {
-	position: fixed !important;
-	top: 0
+    position: static !important;
+    top: auto;
 }
 
+/* 激活链接：VOID 主题自定义样式覆盖 */
 .is-active-link {
-	font-weight: 700
+    font-weight: 500;
 }

@@ -178,11 +178,7 @@ $setting = $GLOBALS['VOIDSetting'];
         </div> <!--end .contents-wrap-->
         <!--目录，可选-->
         <?php if($this->fields->showTOC == '1'): ?>
-            <div class="toc-mask" data-action="close-toc"></div>
-            <div aria-label="文章目录" class="TOC"></div>
-            <style>
-            #toggle-toc { display: block; }
-            </style>
+            <nav aria-label="文章目录" class="TOC"></nav>
         <?php endif;?>
     </div>
     <!--评论区，可选-->

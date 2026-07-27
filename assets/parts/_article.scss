@@ -206,12 +206,6 @@ article {
             width: 1024px;
             margin-left: -102px;
         }
-        @media screen and (min-width: 1200px) and (max-width: 1599.5px) {
-            .sidebar-show & {
-                width: calc(100% + 40px)!important;
-                margin-left: -20px!important;
-            }   
-        }
     }
     a[data-fancybox] {
         display: block;
@@ -350,12 +344,6 @@ article {
             @media screen and (min-width: 1366px) {
                 width: 1200px;
                 margin-left: -190px;
-            }
-        }
-        @media screen and (min-width: 1200px) and (max-width: 1599.5px) {
-            .sidebar-show & {
-                width: 100%!important;
-                margin-left: 0!important;
             }
         }
     }
@@ -560,160 +548,288 @@ article {
     font-family: $void-font-sans!important;
 }
 
-.toc-mask {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: $bgColor;
-    z-index: 3;
-    opacity: 0.85;
-    transition: $animationTime $animationTimingFunc;
-    .theme-dark & {
-        background: $td-bgColor;
-    }
-    display: none;
-    @media screen and (max-width: 1199.5px) {
-        .sidebar-show & {
-            display: block;
-        }   
-    }
-}
-.TOC {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    z-index: 3;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 280px;
-    right: -280px;
-    @include sidebar;
-    padding: 1rem;
-    padding-right: 0;
-    padding-top: 60px;
-    &::-webkit-scrollbar {
-        display: none;
-    }
-    &::before {
-        content: "Contents";
-        position: absolute;
-        left: 0;
-        top: 0;
-        line-height: 60px;
-        height: 60px;
-        width: 100%;
-        font-size: 20px;
-        font-weight: 600;
-        text-transform: uppercase;
-        text-align: center;
-        color: $td-textColor;
-        box-sizing: border-box;
-    }
-    bottom: 0;
-    transition: $animationTime $animationTimingFunc right;
-    .theme-dark &::-webkit-scrollbar{
-        background: none;
-    }
-    * {
-        color: $td-textColor;
-    }
-    .toc-list {
-        position: relative;
-        .toc-list {
-            position: unset;
+/* ============================================
+   左侧章节导航 — 贴合主题的卡片式设计
+   ============================================ */
+
+// 桌面端：左侧留出导航空间
+@media screen and (min-width: 1200px) {
+    body:has(.TOC) {
+        main>.lazy-wrap {
+            padding-left: 240px;
         }
     }
-    li {
-        a {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            display: block;
-            width: 100%;
-            &:hover, &.is-active-link {
-                color: #54bc4b;
+}
+
+// 目录容器：带边框背景的浮动卡片
+.TOC {
+    position: fixed;
+    top: 90px;
+    left: 20px;
+    z-index: 3;
+    width: 200px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    // 卡片外观：边框 + 背景 + 圆角 + 微阴影
+    padding: 1rem 0.75rem;
+    border-radius: 10px;
+    background: $bgColor;
+    border: 1px solid $borderColor;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+
+    .theme-dark & {
+        background: $td-bgColor-light;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3),
+                    0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    // 滚动条极简
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(127, 127, 127, 0.2);
+        border-radius: 2px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .theme-dark &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    // 隐藏 tocbot 默认标题
+    &::before {
+        display: none;
+    }
+
+    // 过渡动画
+    transition: opacity $animationTime $animationTimingFunc,
+                transform $animationTime $animationTimingFunc;
+}
+
+    // 目录列表：简洁缩进式
+.TOC {
+    .toc-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        .toc-list {
+            padding-left: 0.75rem;
+            border-left: 1px solid $borderColor;
+            margin-left: 0.35rem;
+            .theme-dark & {
+                border-color: rgba(255, 255, 255, 0.08);
             }
         }
     }
-    .is-active-link::before {
-        content: "";
-        background-color: rgba(0, 0, 0, 0.3);
-        display: block;
-        height: 2.1rem;
-        left: -1rem;
-        position: absolute;
-        width: calc(100% + 1rem);
-        border-left: 2px solid #54BC4B;
-        z-index: -1;
-        box-sizing: border-box;
+
+    li {
+        margin: 0;
+        list-style: none;
     }
-    @media screen and (min-width: 1199.5px){
-        .toc-link:hover::before {
-            content: "";
-            background-color: rgba(0, 0, 0, 0.3);
-            display: block;
-            height: 2.1rem;
-            left: -1rem;
-            position: absolute;
-            width: calc(100% + 1rem);
-            border-left: 2px solid #54BC4B;
-            z-index: -1;
-            box-sizing: border-box;
+
+    a.toc-link {
+        display: block;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        color: $fadeColor;
+        text-decoration: none;
+        border-radius: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color $animationTime $animationTimingFunc,
+                    background $animationTime $animationTimingFunc;
+
+        // 暗色模式：使用主题变量确保对比度
+        .theme-dark & {
+            color: $td-textColor;
+        }
+
+        &:hover {
+            color: $textColor;
+            background: rgba(0, 0, 0, 0.03);
+            .theme-dark & {
+                color: #fff;
+                background: rgba(255, 255, 255, 0.06);
+            }
         }
     }
-    .sidebar-show & {
-        right: 0;
+
+    // 当前激活章节：绿色左边框 + 淡绿背景
+    a.is-active-link {
+        color: $textColor;
+        font-weight: 500;
+        background: rgba(84, 188, 75, 0.06);
+        border-left: 2px solid #54BC4B;
+        padding-left: calc(0.5rem - 2px);
+        border-radius: 0 6px 6px 0;
+
+        .theme-dark & {
+            color: #fff;
+            background: rgba(84, 188, 75, 0.15);
+            border-left-color: #6dde64;
+        }
     }
+
+    // 嵌套层级视觉降级
+    .toc-list .toc-list {
+        a.toc-link {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.5rem;
+            color: rgba(127, 127, 127, 0.7);
+            .theme-dark & {
+                color: $td-textColor-dark;
+            }
+        }
+    }
+}
+
+// 移动端：浮动按钮 + 弹出卡片
+@media screen and (max-width: 1199.5px) {
+    .TOC {
+        position: fixed;
+        top: auto;
+        bottom: 80px;
+        left: auto;
+        right: 20px;
+        width: auto;
+        max-height: none;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
+
+        // 弹出面板
+        .toc-list {
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            right: 0;
+            width: 260px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: $bgColor;
+            border: 1px solid $borderColor;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            .theme-dark & {
+                background: $td-bgColor-light;
+                border-color: $td-borderColor;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        &.toc-open .toc-list {
+            display: block;
+            animation: toc-slide-up 0.25s $animationTimingFunc;
+        }
+
+        a.toc-link {
+            color: $fadeColor;
+        }
+
+        a.is-active-link {
+            color: #54BC4B;
+            background: rgba(84, 188, 75, 0.06);
+            .theme-dark & {
+                background: rgba(84, 188, 75, 0.1);
+            }
+        }
+    }
+}
+
+// 移动端浮动按钮
+.toc-floating-btn {
+    display: none;
 }
 
 @media screen and (max-width: 1199.5px) {
-    div.contents-wrap {
-        transition: $animationTime $animationTimingFunc opacity;
-    }
-}
-
-@media screen and (min-width: 1199.5px) {
-    div.contents-wrap,
-    main>.lazy-wrap,
-    .banner-source,
-    // Keep layout shift on the outer wrapper so float-up animation can live on #comments.
-    .comments-container,
-    body>footer {
-        transition: $animationTime $animationTimingFunc transform;
-    }
-    body>header{
-        transition: $animationTime $animationTimingFunc all;
-    }
-    .sidebar-show{
-        div.contents-wrap,
-        main>.lazy-wrap,
-        .banner-source,
-        .comments-container,
-        >footer{
-            transform: translateX(-135px);
-            .banner-title {
-                padding-left: 150px;
-                padding-right: 150px;
+    .toc-floating-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: $bgColor;
+        border: 1px solid $borderColor;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        z-index: 4;
+        transition: all $animationTime $animationTimingFunc;
+        .theme-dark & {
+            background: $td-bgColor-light;
+            border-color: $td-borderColor;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        }
+        &:hover {
+            transform: scale(1.05);
+        }
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke: $fadeColor;
+            .theme-dark & {
+                stroke: $td-textColor;
             }
         }
-        >header{
-            padding-right: 270px;
-        }
-    } 
+    }
+
+    body:has(.TOC) .toc-floating-btn {
+        display: flex;
+    }
 }
 
+// 展开动画
+@keyframes toc-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// 桌面端切换按钮
 #toggle-toc {
     display: none;
 }
 
-.sidebar-show #ctrler-panel {
-    #toggle-toc {
-        a {
-            transform: rotate(180deg);
-            animation-fill-mode: forwards;
+@media screen and (min-width: 1200px) {
+    body:has(.TOC) #toggle-toc {
+        display: flex;
+    }
+}
+
+// 桌面端隐藏动画
+@media screen and (min-width: 1200px) {
+    body.toc-hidden {
+        .TOC {
+            opacity: 0;
+            transform: translateX(-8px);
+            pointer-events: none;
         }
+        main>.lazy-wrap {
+            padding-left: 0;
+        }
+    }
+    main>.lazy-wrap {
+        transition: padding-left $animationTime $animationTimingFunc;
     }
 }
 

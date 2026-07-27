@@ -45,34 +45,57 @@ var VOID_Content = {
         }
     },
 
-    // 解析文章目录
+    // 解析文章目录 — 左侧章节导航
     parseTOC: function () {
         if ($('.TOC').length > 0) {
             var toc_option = {
-                // Where to render the table of contents.
                 tocSelector: '.TOC',
-                // Where to grab the headings to build the table of contents.
                 contentSelector: 'div.articleBody',
-                // Which headings to grab inside of the contentSelector element.
                 headingSelector: 'h2, h3, h4, h5',
-                // 收缩深度
-                collapseDepth: 6
+                collapseDepth: 6,
+                // 滚动偏移：避开固定头部
+                scrollSmoothOffset: -80,
+                // 滚动时更新 active 状态
+                scrollSmooth: true,
+                // 滚动偏移量
+                headingsOffset: 80,
+                // 节流
+                throttleTimeout: 50
             };
             tocbot.init(toc_option);
+
+            // 点击目录链接：平滑滚动
             $.each($('.toc-link'), function (i, item) {
                 $(item).click(function () {
                     VOID_Ui.scrollToWithHeader($(this).attr('href'));
+                    // 移动端：点击后关闭浮动面板
                     if (window.innerWidth < 1200) {
-                        TOC.close();
+                        $('.TOC').removeClass('toc-open');
                     }
                     return false;
                 });
             });
-            // 检查目录
-            if (window.innerWidth >= 1200) {
-                TOC.open();
+
+            // 桌面端：默认显示（无需 sidebar-show 类）
+            // 移动端：创建浮动按钮
+            if (window.innerWidth < 1200) {
+                VOID_Content.createTocFloatingBtn();
             }
         }
+    },
+
+    // 创建移动端目录浮动按钮
+    createTocFloatingBtn: function () {
+        if ($('.toc-floating-btn').length > 0) return;
+        var $btn = $('<button>', {
+            class: 'toc-floating-btn',
+            'aria-label': '文章目录',
+            html: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>'
+        });
+        $btn.on('click', function () {
+            $('.TOC').toggleClass('toc-open');
+        });
+        $('body').append($btn);
     },
 
     getFigureImage: function (item) {

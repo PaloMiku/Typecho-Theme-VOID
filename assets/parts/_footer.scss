@@ -7,9 +7,6 @@ footer{
     padding-bottom: 1.5rem;
     .container{
         display: flex;
-        .sidebar-show & {
-            width: $mainWidth;
-        }
         section{
             flex: 1;
             position: relative;
