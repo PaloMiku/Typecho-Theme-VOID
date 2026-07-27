@@ -28,12 +28,10 @@ gulp.task('pack:css:dep', function () {
         .pipe(gulp.dest('./temp/rev/css_bundle'));
 });
 
-// 主 CSS 编译、autoprefix、minify
+// 主 CSS：读取 Vite 已编译产出的 assets/VOID.css，加 hash 戳输出到 build/
+// SCSS->CSS 编译已由 Vite（vite build）完成，Gulp 仅负责发布期的 hash 戳
 gulp.task('pack:css:main', function () {
-    return gulp.src('./assets/VOID.scss')
-        .pipe(sass())
-        .pipe(prefix(prefixerOptions))
-        .pipe(minify())
+    return gulp.src('./assets/VOID.css')
         .pipe(rev())
         .pipe(gulp.dest('./build/assets/'))
         .pipe(rev.manifest())
