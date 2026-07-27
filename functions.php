@@ -166,8 +166,6 @@ function themeConfig($form)
     $form->addInput($pjax);
     $pjaxreload = new Typecho_Widget_Helper_Form_Element_Textarea('pjaxreload', null, null, 'PJAX 重载函数', '输入要重载的 JS，如果你发现站点有点不对劲，又不知道这个选项是啥意思，请关闭 PJAX 并留空此项。');
     $form->addInput($pjaxreload);
-    $serviceworker = new Typecho_Widget_Helper_Form_Element_Text('serviceworker', null, null, '自定义 Service Worker', '如果你知道这是什么，请把你的 SW 文件（例如主题 assets 文件夹下的 VOIDCacheRule.js）复制一份到<b>站点根目录</b>，并在这里填写文件名（例如 VOIDCacheRule.js）。若不知道该选项含义，请留空此项。');
-    $form->addInput($serviceworker);
 
     // 超高级设置
     $advance = new Typecho_Widget_Helper_Form_Element_Textarea('advance', null, null, '超高级设置', '主题中包含一份 advanceSetting.sample.json，自己仿照着写吧。');

@@ -101,35 +101,18 @@ $setting = $GLOBALS['VOIDSetting'];
             </section> 
         </aside>
 
-        <?php if(!empty($setting['serviceworker'])): ?>
-        <script>
-            var serviceWorkerUri = '/<?php echo $setting['serviceworker']; ?>';
-            if ('serviceWorker' in navigator) {  
-                navigator.serviceWorker.register(serviceWorkerUri).then(function() {
-                    if (navigator.serviceWorker.controller) {
-                        console.log('Service woker is registered and is controlling.');
-                    } else {
-                        console.log('Please reload this page to allow the service worker to handle network operations.');
-                    }
-                }).catch(function(error) {
-                    console.log('ERROR: ' + error);
-                });
-            } else {
-                console.log('Service workers are not supported in the current browser.');
-            }
-        </script>
-        <?php else: ?>
+        <?php
+        // 主题已移除 Service Worker 功能：清理历史遗留的 SW 注册，避免缓存旧资源
+        ?>
         <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister()
-            }}).catch(function(err) {
-                console.log('Service Worker registration failed: ', err);
-            });
+                for (var i = 0; i < registrations.length; i++) {
+                    registrations[i].unregister();
+                }
+            }).catch(function() {});
         }
         </script>
-        <?php endif; ?>
         <script data-manual src="<?php Utils::indexTheme('/assets/bundle.js'); ?>"></script>
         <?php if($setting['enableMath']): ?>
         <script>

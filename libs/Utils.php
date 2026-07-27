@@ -275,7 +275,6 @@ class Utils
             'lazyload' => false,
             'indexBannerTitle' => '',
             'indexBannerSubtitle' => '',
-            'serviceworker' => '',
             'colorScheme' => 0, // 0: 自动，1: 日间，2: 夜间
             'reward' => ''
         );

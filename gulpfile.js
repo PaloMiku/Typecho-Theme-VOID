@@ -95,10 +95,6 @@ gulp.task('md5', function () {
 gulp.task('move', function () {
     gulp.src(['./assets/libs/mathjax/**/*'], { base: './assets/libs/', encoding: false })
         .pipe(gulp.dest('./build/assets/libs/'));
-    gulp.src([
-        './assets/sw-toolbox.js',
-        './assets/VOIDCacheRule.js'])
-        .pipe(gulp.dest('./build/assets/'));
     gulp.src(['./assets/fonts/*'], { encoding: false })
         .pipe(gulp.dest('./build/assets/fonts/'));
     return gulp.src(['./LICENSE',

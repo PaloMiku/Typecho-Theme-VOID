@@ -543,6 +543,10 @@ var VOID = {
                     return false;
                 }
             }
+            // 点击 reaction picker 外部时关闭
+            if ($('.reaction-picker.is-open').length && !VOID_Util.clickIn(e, '.reaction-picker') && !VOID_Util.clickIn(e, '.reaction-add-btn')) {
+                VOID_Vote.closeAllPickers();
+            }
         });
     },
 
@@ -651,6 +655,13 @@ var VOID_Vote = {
         var id = $(item).attr('data-item-id');
         var table = $(item).attr('data-table');
 
+        // emoji 反应走统一逻辑（点击已投表情取消，点击新表情切换）
+        var isEmoji = !/^(up|down)$/.test(type);
+        if (isEmoji) {
+            VOID_Vote.reaction(item, type, table, id);
+            return;
+        }
+
         var cookieName = 'void_vote_' + table + '_' + type;
         var voted = VOID_Util.getCookie(cookieName);
         if (voted == null) voted = ',';
@@ -662,7 +673,7 @@ var VOID_Vote = {
             return;
         }
 
-        // 当是评论投票时检查是否已经投过另一个选项
+        // 当是评论投票时检查是否已经投过另一个选项（仅对 up/down 生效）
         if ($(item).hasClass('comment-vote')) {
             var type_2 = type == 'up' ? 'down' : 'up';
             if (VOID_Vote.checkVoted(type_2, id, table)) {
@@ -688,8 +699,8 @@ var VOID_Vote = {
                 }
                 switch (data.code) {
                     case 200:
-                        var prev = parseInt($(item).find('.value').text());
-                        $(item).find('.value').text(prev + 1);
+                        var prevVal = parseInt($(item).find('.value').text()) || 0;
+                        $(item).find('.value').text(prevVal + 1);
                         break;
                     case 302:
                         VOID.alert('您好像已经投过票了呢～');
@@ -715,16 +726,209 @@ var VOID_Vote = {
     },
 
     reload: function () {
-        // 高亮已记录的
+        // 高亮已记录的普通投票
         $.each($('.vote-button'), function (i, item) {
             var type = $(item).attr('data-type');
+            if (!type) return;
+            // emoji 反应由 applyReactionsState 单独处理
+            if (!/^(up|down)$/.test(type)) return;
             var id = $(item).attr('data-item-id');
             var table = $(item).attr('data-table');
-
             if (VOID_Vote.checkVoted(type, id, table)) {
                 $(item).addClass('done');
             }
         });
+        VOID_Vote.applyReactionsState();
+    },
+
+    // ===== Emoji Reaction Cookie =====
+    // 每个目标（评论/文章）使用单个 cookie，键为 void_reaction_<table>_<id>，
+    // 值为当前已投的 emoji 字符串（或空表示未投）。一目标仅记录一个表情。
+    reactionCookieName: function (table, id) {
+        return 'void_reaction_' + table + '_' + id;
+    },
+
+    getReaction: function (table, id) {
+        return VOID_Util.getCookie(VOID_Vote.reactionCookieName(table, id)) || '';
+    },
+
+    setReaction: function (table, id, emoji) {
+        if (emoji) {
+            VOID_Util.setCookie(VOID_Vote.reactionCookieName(table, id), emoji, 3600 * 24 * 90);
+        } else {
+            // 取消：置空 cookie（max-age=0 删除）
+            VOID_Util.setCookie(VOID_Vote.reactionCookieName(table, id), '', 0);
+        }
+    },
+
+    /**
+     * 根据 cookie 状态恢复 reaction 按钮的高亮
+     */
+    applyReactionsState: function () {
+        $('.comment-reactions, .post-reactions').each(function () {
+            var $container = $(this);
+            var table = $container.hasClass('comment-reactions') ? 'comment' : 'content';
+            var id = $container.attr('data-comment-id') || $container.attr('data-post-id');
+            if (!id) return;
+            var current = VOID_Vote.getReaction(table, id);
+            $container.find('.reaction-btn').each(function () {
+                var $btn = $(this);
+                if (current && $btn.attr('data-type') === current) {
+                    $btn.addClass('done');
+                } else {
+                    $btn.removeClass('done');
+                }
+            });
+        });
+    },
+
+    /**
+     * 提交 emoji 反应（点击 picker 内表情 或 点击已有 reaction 按钮均走此入口）
+     * 行为：与当前已投表情相同 => 取消；不同 => 切换；无 => 新增。
+     * UI 更新依据服务端返回的 msg（added/switched/cancelled），避免本地与服务端状态不一致。
+     * @param el - 触发元素
+     * @param emoji - emoji 字符串，如 '👍'
+     * @param table - 'comment' 或 'content'
+     * @param id - 目标 ID
+     */
+    reaction: function (el, emoji, table, id) {
+        $.ajax({
+            url: VOIDConfig.votePath + table,
+            type: 'POST',
+            data: JSON.stringify({
+                'id': parseInt(id),
+                'type': emoji
+            }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (data) {
+                if (data.code >= 200 && data.code < 400) {
+                    switch (data.msg) {
+                        case 'added':
+                            VOID_Vote.setReaction(table, id, emoji);
+                            VOID_Vote.adjustCount(table, id, emoji, +1);
+                            VOID_Vote.markDone(table, id, emoji);
+                            break;
+                        case 'switched':
+                            // 旧 emoji 计数 -1、去高亮；新 emoji 计数 +1、加高亮
+                            if (data.previous) {
+                                VOID_Vote.adjustCount(table, id, data.previous, -1);
+                                VOID_Vote.removeDone(table, id, data.previous);
+                            }
+                            VOID_Vote.setReaction(table, id, emoji);
+                            VOID_Vote.adjustCount(table, id, emoji, +1);
+                            VOID_Vote.markDone(table, id, emoji);
+                            break;
+                        case 'cancelled':
+                            VOID_Vote.setReaction(table, id, '');
+                            VOID_Vote.adjustCount(table, id, emoji, -1);
+                            VOID_Vote.removeDone(table, id, emoji);
+                            break;
+                        default:
+                            // 兜底：按本地 cookie 状态恢复一次
+                            VOID_Vote.applyReactionsState();
+                            break;
+                    }
+                    VOID_Vote.closeAllPickers();
+                } else {
+                    switch (data.code) {
+                        case 403:
+                            VOID.alert('暂不支持更改表态哦～');
+                            break;
+                        default:
+                            VOID.alert(data.msg || '操作失败，请稍后重试');
+                            break;
+                    }
+                }
+            },
+            error: function () {
+                VOID.alert('表态失败 o(╥﹏╥)o，请稍后重试');
+            }
+        });
+    },
+
+    /**
+     * 调整某个目标某个 emoji 的计数（增减 1），并在计数归零时移除按钮
+     */
+    adjustCount: function (table, id, emoji, delta) {
+        var $container = VOID_Vote.findContainer(table, id);
+        if (!$container || !$container.length) return;
+        var $btn = $container.find('.reaction-btn').filter(function () {
+            return $(this).attr('data-type') === emoji;
+        });
+        if (!$btn.length) {
+            // 新增按钮（仅在 +1 时需要）
+            if (delta > 0) {
+                var $newBtn = $('<a no-pjax target="_self" class="reaction-btn comment-reaction vote-button" ' +
+                    'href="javascript:void(0)" onclick="VOID_Vote.vote(this)" ' +
+                    'data-item-id="' + id + '" data-type="' + emoji + '" data-table="' + table + '">' +
+                    emoji + ' <span class="count">1</span></a>');
+                $container.find('.reaction-add-wrapper').before($newBtn);
+            }
+            return;
+        }
+        var $count = $btn.find('.count');
+        var prev = parseInt($count.text()) || 0;
+        var next = prev + delta;
+        if (next <= 0) {
+            $btn.remove();
+        } else {
+            $count.text(next);
+        }
+    },
+
+    /**
+     * 高亮指定 emoji 按钮（先清除同容器内其它按钮的高亮）
+     */
+    markDone: function (table, id, emoji) {
+        var $container = VOID_Vote.findContainer(table, id);
+        if (!$container || !$container.length) return;
+        $container.find('.reaction-btn').removeClass('done');
+        $container.find('.reaction-btn').each(function () {
+            if ($(this).attr('data-type') === emoji) {
+                $(this).addClass('done');
+            }
+        });
+    },
+
+    removeDone: function (table, id, emoji) {
+        var $container = VOID_Vote.findContainer(table, id);
+        if (!$container || !$container.length) return;
+        $container.find('.reaction-btn').each(function () {
+            if ($(this).attr('data-type') === emoji) {
+                $(this).removeClass('done');
+            }
+        });
+    },
+
+    findContainer: function (table, id) {
+        if (table === 'comment') {
+            return $('.comment-reactions[data-comment-id="' + id + '"]');
+        }
+        return $('.post-reactions[data-post-id="' + id + '"]');
+    },
+
+    /**
+     * 展开/收起 emoji picker 面板
+     */
+    togglePicker: function (btn) {
+        var $wrapper = $(btn).closest('.reaction-add-wrapper');
+        var $picker = $wrapper.find('.reaction-picker');
+        var isOpen = $picker.hasClass('is-open');
+
+        // 关闭其他打开的 picker
+        VOID_Vote.closeAllPickers();
+
+        if (!isOpen) {
+            $picker.addClass('is-open');
+        }
+    },
+
+    /**
+     * 关闭所有打开的 picker
+     */
+    closeAllPickers: function () {
+        $('.reaction-picker.is-open').removeClass('is-open');
     },
 
     toggleFoldComment: function (coid, item) {

@@ -713,20 +713,40 @@ article {
         }
     }
 }
-#social {
-    .post-like {
-        margin: 0 auto;
-        display: block;
-        font-weight: bold !important;
-        color: $fadeColor !important;
-        .theme-dark & {
-            color: $td-textColor !important;
+
+/* 文章底部 Emoji Reaction 区 */
+.post-reactions{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0.5rem 0 0.25rem;
+    .reaction-btn{
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.15em 0.6em;
+        border-radius: 1em;
+        border: 1px solid rgba(0,0,0,.12);
+        font-size: 0.9rem;
+        cursor: pointer;
+        color: $textColor;
+        .theme-dark &{
+            color: $td-textColor;
+            border-color: rgba(#fff, 0.15);
         }
         &:hover,
-        &.done {
-            color: white !important;
-            border: 2px solid $darkColor !important;
+        &.done{
+            color: $highlightColor;
+            border-color: $highlightColor;
         }
+        .count{
+            font-size: 0.8rem;
+        }
+    }
+    /* picker 在文章底部向上展开 */
+    .reaction-add-wrapper .reaction-picker{
+        bottom: calc(100% + 6px);
     }
 }
 .littlefoot {

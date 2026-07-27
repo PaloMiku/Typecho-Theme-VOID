@@ -89,6 +89,24 @@ VOID_Util = {
             return unescape(arr[2]);
         else
             return null;
+    },
+
+    /**
+     * 将 emoji 插入评论输入框光标位置
+     * @param el - 触发元素（.smilies-item），需有 data-tag 属性
+     */
+    insertEmoji: function (el) {
+        var emoji = $(el).attr('data-tag');
+        if (!emoji) return;
+        var textarea = document.getElementById('textarea');
+        if (!textarea) return;
+
+        var start = textarea.selectionStart;
+        var end = textarea.selectionEnd;
+        var text = textarea.value;
+        textarea.value = text.substring(0, start) + emoji + text.substring(end);
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
     }
 };
 

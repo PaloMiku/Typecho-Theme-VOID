@@ -33,13 +33,59 @@ $setting = $GLOBALS['VOIDSetting'];
                         <?php $this->content(); ?>
                     </div>
                     
-                    <?php $tags = Contents::getTags($this->cid); if (count($tags) > 0) { 
+                    <?php $tags = Contents::getTags($this->cid); if (count($tags) > 0) {
                         echo '<section class="tags">';
                         foreach ($tags as $tag) {
                             echo '<a href="'.$tag['permalink'].'" rel="tag" class="tag-item">'.$tag['name'].'</a>';
                         }
                         echo '</section>';
                     } ?>
+
+                    <?php if($this->is('post') && $setting['VOIDPlugin']):
+                        // 从 votes 表聚合文章的 emoji 反应计数
+                        $postReactions = array();
+                        try {
+                            $_db = Typecho_Db::get();
+                            $_rows = $_db->fetchAll($_db->select('type', 'COUNT(*) AS cnt')
+                                ->from('table.votes')
+                                ->where('id = ?', $this->cid)
+                                ->where('table = ?', 'contents')
+                                ->group('type'));
+                            foreach ($_rows as $_r) {
+                                if ($_r['type'] !== 'up' && $_r['type'] !== 'down') {
+                                    $postReactions[$_r['type']] = (int)$_r['cnt'];
+                                }
+                            }
+                        } catch (\Throwable $e) {}
+                    ?>
+                    <div class="post-reactions" data-post-id="<?php echo $this->cid;?>">
+                        <?php foreach ($postReactions as $emoji => $count):
+                            if ($count > 0): ?>
+                            <a no-pjax target="_self" class="reaction-btn comment-reaction vote-button"
+                                href="javascript:void(0)"
+                                onclick="VOID_Vote.vote(this)"
+                                data-item-id="<?php echo $this->cid;?>"
+                                data-type="<?php echo htmlspecialchars($emoji, ENT_QUOTES, 'UTF-8');?>"
+                                data-table="content"
+                            ><?php echo $emoji; ?> <span class="count"><?php echo $count;?></span></a>
+                        <?php endif; endforeach; ?>
+                        <div class="reaction-add-wrapper">
+                            <button class="reaction-add-btn" type="button" onclick="VOID_Vote.togglePicker(this)" title="添加表态">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11v1a10 10 0 1 1-9-10"></path><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 5h6"></path><path d="M19 2v6"></path></svg>
+                            </button>
+                            <div class="reaction-picker">
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👍', 'content', <?php echo $this->cid;?>)">👍</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '❤️', 'content', <?php echo $this->cid;?>)">❤️</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '😂', 'content', <?php echo $this->cid;?>)">😂</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🎉', 'content', <?php echo $this->cid;?>)">🎉</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🔥', 'content', <?php echo $this->cid;?>)">🔥</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👀', 'content', <?php echo $this->cid;?>)">👀</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🤡', 'content', <?php echo $this->cid;?>)">🤡</span>
+                                <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🤔', 'content', <?php echo $this->cid;?>)">🤔</span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                     <div class="social-button" 
                         data-url="<?php $this->permalink(); ?>"
@@ -52,18 +98,6 @@ $setting = $GLOBALS['VOIDSetting'];
                         <?php if(!empty($setting['reward'])):?>
                             <a data-fancybox="gallery-reward" role=button aria-label="赞赏" data-src="#reward" href="javascript:;" class="btn btn-normal btn-highlight">赏杯咖啡</a>
                             <div hidden id="reward"><img src="<?php echo $setting['reward']; ?>"></div>
-                        <?php endif; ?>
-                        <?php if($setting['VOIDPlugin']):?>
-                            <a role=button 
-                                aria-label="为文章点赞" 
-                                id="social" 
-                                href="javascript:void(0);" onclick="VOID_Vote.vote(this);" 
-                                data-item-id="<?php echo $this->cid;?>" 
-                                data-type="up"
-                                data-table="content"
-                                class="btn btn-normal post-like vote-button"
-                            >ENJOY <span class="value"><?php echo $this->likes; ?></span>
-                            </a>
                         <?php endif; ?>
                         
                         <a aria-label="分享到微博" href="javascript:void(0);" onclick="Share.toWeibo(this);" class="social-button-icon"><i class="voidicon-weibo"></i></a>

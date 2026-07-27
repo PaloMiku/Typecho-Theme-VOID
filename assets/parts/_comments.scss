@@ -251,8 +251,33 @@
                     }
                     font-size: 0.9rem;
                     &.comment-vote:hover,
-                    &.comment-vote.done {
+                    &.comment-vote.done,
+                    &.reaction-btn:hover,
+                    &.reaction-btn.done {
                         color: $highlightColor!important;
+                    }
+                }
+                // Emoji Reaction 区域
+                .comment-reactions{
+                    display: inline-flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 0.35rem;
+                }
+                .reaction-btn{
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.2rem;
+                    padding: 0.1em 0.5em;
+                    border-radius: 1em;
+                    border: 1px solid rgba(0,0,0,.12);
+                    font-size: 0.85rem;
+                    cursor: pointer;
+                    .theme-dark &{
+                        border-color: rgba(#fff, 0.15);
+                    }
+                    .count{
+                        font-size: 0.8rem;
                     }
                 }
             }
@@ -452,6 +477,94 @@
                     margin-left: calc(38px + 10px);
                     padding-left: 0;
                 }
+            }
+        }
+    }
+}
+
+/* ===== Emoji Reaction Picker 共享样式（评论 + 文章） ===== */
+.reaction-add-wrapper{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    .reaction-add-btn{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 1px solid rgba(0,0,0,.12);
+        border-radius: 50%;
+        background: none;
+        color: rgba(0,0,0,.4);
+        cursor: pointer;
+        transition: all .15s ease;
+        .theme-dark &{
+            border-color: rgba(#fff, 0.15);
+            color: $td-textColor-dark;
+        }
+        &:hover{
+            color: $highlightColor;
+            border-color: $highlightColor;
+        }
+    }
+    .reaction-picker{
+        display: none;
+        position: absolute;
+        bottom: calc(100% + 6px);
+        left: 0;
+        z-index: 100;
+        padding: 4px 6px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        .theme-dark &{
+            background: $td-bgColor-dark;
+            border-color: rgba(#fff, 0.1);
+        }
+        .reaction-picker-emoji{
+            display: inline-block;
+            font-size: 20px;
+            line-height: 1.5;
+            padding: 2px 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: transform .1s ease, background .1s ease;
+            &:hover{
+                transform: scale(1.2);
+                background: rgba(0,0,0,.05);
+                .theme-dark &{
+                    background: rgba(#fff, 0.08);
+                }
+            }
+        }
+        &.is-open{
+            display: inline-flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 2px;
+            white-space: nowrap;
+        }
+    }
+}
+
+/* ===== 快捷 Emoji 栏（评论输入区） ===== */
+.smiley-wrapper{
+    margin: 8px 0;
+    #smiliesbox{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        .smilies-item{
+            display: inline-block;
+            font-size: 20px;
+            line-height: 1.5;
+            cursor: pointer;
+            transition: transform .1s ease;
+            &:hover{
+                transform: scale(1.2);
             }
         }
     }

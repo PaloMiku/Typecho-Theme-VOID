@@ -176,8 +176,10 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
 
         if ($setting['VOIDPlugin']) {
             $metaArr = $this->getLikesAndDislikes();
-            if ($metaArr['dislikes'] >= $setting['commentFoldThreshold'][0]
-            && ($metaArr['dislikes'] >= $metaArr['likes']*$setting['commentFoldThreshold'][1])) {
+            $likeCount = $this->getLikeCount();
+            $dislikeCount = $this->getDislikeCount();
+            if ($dislikeCount >= $setting['commentFoldThreshold'][0]
+            && ($dislikeCount >= $likeCount*$setting['commentFoldThreshold'][1])) {
                 $commentClass .= ' fold';
             }
         }
@@ -202,8 +204,8 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
             </div>
         </div>
         <div class="comment-content yue">
-            <?php if ($setting['VOIDPlugin'] && $metaArr['dislikes'] >= $setting['commentFoldThreshold'][0]
-            && ($metaArr['dislikes'] >= $metaArr['likes']*$setting['commentFoldThreshold'][1])) { ?>
+            <?php if ($setting['VOIDPlugin'] && $dislikeCount >= $setting['commentFoldThreshold'][0]
+            && ($dislikeCount >= $likeCount*$setting['commentFoldThreshold'][1])) { ?>
                 <span class="fold">[该评论已被自动折叠 | <a no-pjax target="_self" href="javascript:void(0)" 
                 onclick="VOID_Vote.toggleFoldComment(<?php echo $this->coid; ?>, this)">点击展开</a>]</span>
             <?php }?>
@@ -216,23 +218,36 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
             <?php if ('waiting' == $this->status) { ?>
             <em class="comment-awaiting-moderation"><?php $singleCommentOptions->commentStatus(); ?></em>
             <?php } ?>
-            <?php if ($setting['VOIDPlugin']) { ?>
-            <a no-pjax target="_self" class="comment-vote vote-button" 
-                href="javascript:void(0)" 
-                onclick="VOID_Vote.vote(this)"
-                data-item-id="<?php echo $this->coid;?>" 
-                data-type="up"
-                data-table="comment"
-            ><i class="voidicon-thumbs-up"></i> <span class="value"><?php echo $metaArr['likes']?></span>
-            </a>
-            <a no-pjax target="_self" class="comment-vote vote-button" 
-                href="javascript:void(0)" 
-                onclick="VOID_Vote.vote(this)"
-                data-item-id="<?php echo $this->coid;?>" 
-                data-type="down"
-                data-table="comment"
-            ><i class="voidicon-thumbs-down"></i> <span class="value"><?php echo $metaArr['dislikes']?></span>
-            </a>
+            <?php if ($setting['VOIDPlugin']) {
+                $reactions = $this->getReactions();
+            ?>
+            <div class="comment-reactions" data-comment-id="<?php echo $this->coid;?>">
+                <?php foreach ($reactions as $emoji => $count):
+                    if ($count > 0): ?>
+                    <a no-pjax target="_self" class="reaction-btn comment-reaction vote-button"
+                        href="javascript:void(0)"
+                        onclick="VOID_Vote.vote(this)"
+                        data-item-id="<?php echo $this->coid;?>"
+                        data-type="<?php echo htmlspecialchars($emoji, ENT_QUOTES, 'UTF-8');?>"
+                        data-table="comment"
+                    ><?php echo $emoji; ?> <span class="count"><?php echo $count;?></span></a>
+                <?php endif; endforeach; ?>
+                <div class="reaction-add-wrapper">
+                    <button class="reaction-add-btn" type="button" onclick="VOID_Vote.togglePicker(this)" title="添加表态">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11v1a10 10 0 1 1-9-10"></path><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 5h6"></path><path d="M19 2v6"></path></svg>
+                    </button>
+                    <div class="reaction-picker">
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👍', 'comment', <?php echo $this->coid;?>)">👍</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👎', 'comment', <?php echo $this->coid;?>)">👎</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🤡', 'comment', <?php echo $this->coid;?>)">🤡</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '❤️', 'comment', <?php echo $this->coid;?>)">❤️</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🔥', 'comment', <?php echo $this->coid;?>)">🔥</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '👀', 'comment', <?php echo $this->coid;?>)">👀</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '😂', 'comment', <?php echo $this->coid;?>)">😂</span>
+                        <span class="reaction-picker-emoji" onclick="VOID_Vote.reaction(this, '🤔', 'comment', <?php echo $this->coid;?>)">🤔</span>
+                    </div>
+                </div>
+            </div>
             <?php } ?>
             <span class="comment-reply">
                 <?php $this->reply($singleCommentOptions->replyWord); ?>
@@ -295,6 +310,49 @@ class VOID_Widget_Comments_Archive extends Widget_Abstract_Comments
             ->from('table.comments')
             ->where('coid = ?', $this->coid));
         return array('likes' => $row['likes'], 'dislikes' => $row['dislikes']);
+    }
+
+    /**
+     * 获取评论的 emoji 反应计数（从 votes 表聚合）
+     * 返回 ['👍' => 3, '❤️' => 1, ...]
+     */
+    private function getReactions() {
+        $db = Typecho_Db::get();
+        $rows = $db->fetchAll($db->select('type', 'COUNT(*) AS cnt')
+            ->from('table.votes')
+            ->where('id = ?', $this->coid)
+            ->where('table = ?', 'comments')
+            ->group('type'));
+        $reactions = array();
+        foreach ($rows as $row) {
+            // 跳过旧的 up/down 类型，只保留 emoji 反应
+            if ($row['type'] !== 'up' && $row['type'] !== 'down') {
+                $reactions[$row['type']] = (int)$row['cnt'];
+            }
+        }
+        return $reactions;
+    }
+
+    /**
+     * 获取 👎 反应数量（用于折叠判定，兼容旧 dislikes 字段 + 新 emoji 👎）
+     */
+    private function getDislikeCount() {
+        // 先从 votes 表查 👎 emoji 反应
+        $reactions = $this->getReactions();
+        $emojiDislike = isset($reactions['👎']) ? (int)$reactions['👎'] : 0;
+        // 兼容旧的 dislikes 字段
+        $metaArr = $this->getLikesAndDislikes();
+        return $emojiDislike + (int)$metaArr['dislikes'];
+    }
+
+    /**
+     * 获取 👍 反应数量（兼容旧 likes 字段 + 新 emoji 👍）
+     */
+    private function getLikeCount() {
+        $reactions = $this->getReactions();
+        $emojiLike = isset($reactions['👍']) ? (int)$reactions['👍'] : 0;
+        $metaArr = $this->getLikesAndDislikes();
+        return $emojiLike + (int)$metaArr['likes'];
     }
     
     /**

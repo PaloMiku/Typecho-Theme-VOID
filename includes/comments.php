@@ -64,10 +64,22 @@ $this->widget('VOID_Widget_Comments_Archive', $parameter)->to($comments);
                         </div>
                     <?php endif; ?>
                     <p style="margin-top:0">
-                        <textarea aria-label="评论输入框" class="input-area" rows="5" name="text" id="textarea" 
-                            placeholder="在这里输入你的评论..." 
+                        <textarea aria-label="评论输入框" class="input-area" rows="5" name="text" id="textarea"
+                            placeholder="在这里输入你的评论，支持 Markdown 语法..."
                             style="resize:none;"><?php $this->remember('text'); ?></textarea>
                     </p>
+                    <div class="smiley-wrapper">
+                        <div id="smiliesbox">
+                            <span class="smilies-item" data-tag="😂" onclick="VOID_Util.insertEmoji(this)">😂</span>
+                            <span class="smilies-item" data-tag="🤡" onclick="VOID_Util.insertEmoji(this)">🤡</span>
+                            <span class="smilies-item" data-tag="😎" onclick="VOID_Util.insertEmoji(this)">😎</span>
+                            <span class="smilies-item" data-tag="😡" onclick="VOID_Util.insertEmoji(this)">😡</span>
+                            <span class="smilies-item" data-tag="😁" onclick="VOID_Util.insertEmoji(this)">😁</span>
+                            <span class="smilies-item" data-tag="😋" onclick="VOID_Util.insertEmoji(this)">😋</span>
+                            <span class="smilies-item" data-tag="😭" onclick="VOID_Util.insertEmoji(this)">😭</span>
+                            <span class="smilies-item" data-tag="😑" onclick="VOID_Util.insertEmoji(this)">😑</span>
+                        </div>
+                    </div>
                     <p class="comment-buttons">
                         <?php if(Utils::isPluginAvailable('CommentToMail') || Utils::isPluginAvailable('Mailer')): ?>
                         <span class="comment-mail-me">
