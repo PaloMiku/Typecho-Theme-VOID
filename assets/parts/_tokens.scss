@@ -1,0 +1,87 @@
+@use "./var" as *;
+
+// 设计令牌层：将 SCSS 变量提升为 CSS 自定义属性
+// 日间模式默认值（:root），暗色模式由 prefers-color-scheme + [data-theme] 双轨覆盖
+// 现有 .theme-dark & 嵌套块在过渡期保留，长期逐块迁移至 var(--void-*)
+
+:root {
+    // 背景与文本
+    --void-bg: #{$bgColor};
+    --void-text: #{$textColor};
+    --void-fade: #{$fadeColor};
+    --void-dark: #{$darkColor};
+    --void-accent: #{$highlightColor};
+    --void-border: #{$borderColor};
+
+    // 主内容宽度
+    --void-main-width: #{$mainWidth};
+    --void-main-width-narrow: #{$mainWidth-narrow};
+    --void-main-width-wide: #{$mainWidth-wide};
+
+    // 头部
+    --void-header-bg: #{$headerBgColor};
+    --void-header-bg-light: #{$headerBgColor-light};
+    --void-header-bg-blur: #{$headerBgColor-blur};
+    --void-header-text: #{$headerTextColor};
+    --void-header-text-highlight: #{$headerTextColor-highlight};
+
+    // 动画
+    --void-anim-time: #{$animationTime};
+    --void-anim-time-slow: #{$animationTime-slow};
+    --void-anim-time-fast: #{$animationTime-fast};
+    --void-anim-time-very-slow: #{$animationTime-very-slow};
+    --void-anim-easing: #{$animationTimingFunc};
+
+    // 字体
+    --void-font-sans: #{$void-font-sans};
+    --void-font-default: #{$void-font-default};
+    --void-font-serif: #{$void-font-serif};
+}
+
+// 暗色模式双轨：
+// 1) 跟随系统（prefers-color-scheme: dark），除非用户手动指定 [data-theme="light"]
+// 2) 用户手动切换（[data-theme="dark"]），覆盖系统偏好
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --void-bg: #{$td-bgColor};
+        --void-text: #{$td-textColor};
+        --void-fade: #{$td-textColor-light};
+        --void-dark: #{$td-bgColor-dark};
+        --void-border: #{$td-borderColor};
+
+        --void-header-bg: #{$headerBgColor};
+        --void-header-text: #{$headerTextColor};
+
+        --void-anim-easing: #{$animationTimingFunc};
+    }
+}
+
+[data-theme="dark"] {
+    --void-bg: #{$td-bgColor};
+    --void-text: #{$td-textColor};
+    --void-fade: #{$td-textColor-light};
+    --void-dark: #{$td-bgColor-dark};
+    --void-border: #{$td-borderColor};
+
+    --void-header-bg: #{$headerBgColor};
+    --void-header-text: #{$headerTextColor};
+}
+
+// 响应式断点 mixin（统一现有零散的 767px/767.5px/1199.5px/1200px 等）
+$bp-mobile: 767px;
+$bp-tablet: 1023px;
+$bp-desktop: 1199px;
+$bp-wide: 1599px;
+
+@mixin mobile {
+    @media (max-width: #{$bp-mobile}) { @content; }
+}
+@mixin tablet {
+    @media (max-width: #{$bp-tablet}) { @content; }
+}
+@mixin desktop {
+    @media (min-width: #{$bp-tablet + 1px}) { @content; }
+}
+@mixin desktop-wide {
+    @media (min-width: #{$bp-desktop + 1px}) { @content; }
+}

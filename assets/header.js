@@ -564,6 +564,12 @@ VOID_Ui = {
     },
 
     DarkModeSwitcher: {
+        // 同步 body.theme-dark 到 html[data-theme]，驱动 CSS 令牌双轨切换
+        syncDataTheme: function () {
+            var isDark = document.body.classList.contains('theme-dark');
+            document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+        },
+
         checkColorScheme: function () {
             // 非自动模式
             if (VOIDConfig.colorScheme != 0) {
@@ -616,6 +622,7 @@ VOID_Ui = {
                     }
                 }
             }
+            this.syncDataTheme();
         },
     
         toggleByHand: function () {
@@ -627,6 +634,7 @@ VOID_Ui = {
                 } else {
                     VOID_Util.setCookie('theme_dark', '0', 0);
                 }
+                VOID_Ui.DarkModeSwitcher.syncDataTheme();
                 setTimeout(function () {
                     $('#toggle-night').removeClass('switching');
                 }, 1000);

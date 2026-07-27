@@ -2,9 +2,9 @@ html{line-height:1.15;-webkit-text-size-adjust:100%;}body{margin:0;}main{display
 input:not([type="checkbox"]), textarea {
     -webkit-appearance: none;
 }
-input:-webkit-autofill {  
-    -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;  
-} 
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px var(--void-bg) inset !important;
+}
 br {
     content: ""; /* clears default height */
     display: block; /* makes it have a width */
